@@ -31,7 +31,12 @@ subprojects {
     }
 }
 
-project(":core") { }
+project(":core") {
+    dependencies {
+        "implementation"("io.ktor:ktor-client-core:1.6.5")
+        "implementation" ("io.ktor:ktor-client-cio:1.6.5")
+    }
+}
 
 project(":repositories") {
     apply(plugin = "org.springframework.boot")
@@ -57,6 +62,8 @@ project(":delivery") {
         "implementation"("com.fasterxml.jackson.module:jackson-module-kotlin")
         "implementation"("commons-validator:commons-validator:1.6")
         "implementation"("com.google.guava:guava:23.0")
+        "implementation"("io.ktor:ktor-client-core:1.6.5")
+        "implementation" ("io.ktor:ktor-client-cio:1.6.5")
 
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         "testImplementation"("org.mockito.kotlin:mockito-kotlin:3.2.0")
