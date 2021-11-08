@@ -65,6 +65,8 @@ project(":delivery") {
         "implementation"("io.ktor:ktor-client-core:1.6.5")
         "implementation" ("io.ktor:ktor-client-cio:1.6.5")
 
+        "implementation" ("org.apache.commons:commons-csv:1.5")
+
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         "testImplementation"("org.mockito.kotlin:mockito-kotlin:3.2.0")
     }
