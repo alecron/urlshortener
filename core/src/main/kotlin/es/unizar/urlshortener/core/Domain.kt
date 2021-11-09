@@ -52,3 +52,19 @@ data class ClickProperties(
     val platform: String? = null,
     val country: String? = null
 )
+
+/**
+ * A [Format] specifies the format of a QR generation [QRService].
+ * By default, the [height] and [width] are 500.
+ * By default, the [color] is "0xFF000000".
+ * By default, the [background] is "0xFFFFFFFF"
+ * By default, the [typeImage] is "image/png"
+ */
+data class Format (
+        val height: Int = 500,
+        val width: Int = 500,
+        val color: String = "0xFF000000",       //0xFFFF6666
+        val background: String = "0xFFFFFFFF",  //0xFFFFCCCC
+        val typeImage: String = "PNG",
+        val errorCorrectionLevel: String = "L"
+)

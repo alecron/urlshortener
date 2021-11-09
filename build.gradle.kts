@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.util.findInterfaceImplementation
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
@@ -57,6 +58,9 @@ project(":delivery") {
         "implementation"("com.fasterxml.jackson.module:jackson-module-kotlin")
         "implementation"("commons-validator:commons-validator:1.6")
         "implementation"("com.google.guava:guava:23.0")
+        //QR generator
+        "implementation"("com.google.zxing:core:3.3.3")
+        "implementation"("com.google.zxing:javase:3.3.3")
 
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         "testImplementation"("org.mockito.kotlin:mockito-kotlin:3.2.0")

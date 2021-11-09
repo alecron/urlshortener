@@ -120,7 +120,121 @@ The above functionality is available through a simple API:
 
 In addition, `GET /` returns the landing page of the system. 
 
+## F1. Service that given a shortened URL returns a QR.
 
+### Funcionality
+  The funcionality of F1 is R3.
+  
+  R3: The shortened URI can be obtained encoded in a QR code
+
+### POST /link
+
+* POST /link will support an optional parameter (qr) by which it will be indicated if there will or won't be a QR code representation of the shortened URI. If it isn't not present, it will be understood that there won't be a QR code. The http response will contain a property in the JSON that will have the complete URI address of the QR code.
+
+#### Example without qr parameter:
+
+```shell
+$ curl -v -d "url=http://www.unizar.es/" http://localhost:8080/api/link
+*   Trying 127.0.0.1...
+* TCP_NODELAY set
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+> POST /api/link HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.58.0
+> Accept: */*
+> Content-Length: 25
+> Content-Type: application/x-www-form-urlencoded  
+>
+* upload completely sent off: 25 out of 25 bytes   
+< HTTP/1.1 201
+< Location: http://localhost:8080/tiny-6bb9db44
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Tue, 09 Nov 2021 18:06:31 GMT
+<
+* Connection #0 to host localhost left intact
+{"url":"http://localhost:8080/tiny-6bb9db44","qr":null,"properties":{"safe":true}}
+```
+If you don't add de qr parameter, the http response will be the same as getting a shortened url
+
+#### Example with qr parameter:
+
+```shell
+$ curl -v -d "url=http://www.unizar.es/&qr=true" http://localhost:8080/api/link
+*   Trying 127.0.0.1...
+* TCP_NODELAY set
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+> POST /api/link HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.58.0
+> Accept: */*
+> Content-Length: 33
+> Content-Type: application/x-www-form-urlencoded  
+>
+* upload completely sent off: 33 out of 33 bytes   
+< HTTP/1.1 201
+< Location: http://localhost:8080/tiny-6bb9db44
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Tue, 09 Nov 2021 17:59:29 GMT
+<
+* Connection #0 to host localhost left intact
+{"url":"http://localhost:8080/tiny-6bb9db44","qr":"http://localhost:8080/qr/6bb9db44","properties":{"safe":true}}
+```
+If you click on the qr URI address, you can see the QR code.
+
+### GET /qr/{hash}[.{format}]
+
+* GET /qr/{hash}[.{format}] returns an image with the correct content type; it must correspond to the URI obtained in the previous method. If the hash does not exist in the database or cannot be done a redirect with that hash for whatever reason (for example, not validated), the appropriate 400 type error will be returned.
+
+#### Example with format parameter:
+
+AUN NO FUNCIONA. Pongo como imagen un ejemplo de resultado que deberia de generar.
+
+The output of the GET request has been output to the file QRCode6bb9db44WithFormat.png
+
+If you open this file, you can see the QR code.
+
+![alt text](QRCode6bb9db44WithFormat.png)
+
+#### Example without format parameter:
+
+```shell
+$ curl -v http://localhost:8080/qr/6bb9db44 --output QRCode6bb9db44.png
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 127.0.0.1...
+* TCP_NODELAY set
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+> GET /qr/6bb9db44 HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.58.0
+> Accept: */*
+>
+< HTTP/1.1 200
+< Content-Type: image/png
+< Content-Length: 767
+< Date: Tue, 09 Nov 2021 18:01:39 GMT
+<
+{ [767 bytes data]
+100   767  100   767    0     0  17044      0 --:--:-- --:--:-- --:--:-- 17044
+* Connection #0 to host localhost left intact
+```
+The output of the GET request has been output to the file QRCode6bb9db44.png
+
+If you open this file, you can see the QR code.
+
+![alt text](QRCode6bb9db44.png)
+
+### FALTA DE HACER
+
+* Arreglar: Que se pueda pasar el formato de forma opcional
+* Hacer: Si alguna de las dos peticiones anteriores devuelve errores de tipo 400 por más de un motivo deberá devolver un objeto JSON especificando el motivo concreto del error el usuario. 
+
+  Ejemplo:
+  {
+   “error”: “URI de destino no validada todavía”
+  }
 
 ## Repositories
 

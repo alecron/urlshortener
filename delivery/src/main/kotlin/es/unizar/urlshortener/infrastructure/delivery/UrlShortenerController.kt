@@ -1,8 +1,7 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import es.unizar.urlshortener.core.ClickProperties
-import es.unizar.urlshortener.core.ShortUrl
+import es.unizar.urlshortener.core.Format
 import es.unizar.urlshortener.core.ShortUrlProperties
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
@@ -42,6 +41,7 @@ interface UrlShortenerController {
  */
 data class ShortUrlDataIn(
     val url: String,
+    val qr: Boolean? = null,
     val sponsor: String? = null
 )
 
@@ -50,6 +50,7 @@ data class ShortUrlDataIn(
  */
 data class ShortUrlDataOut(
     val url: URI? = null,
+    val qr: URI? = null,
     val properties: Map<String, Any> = emptyMap()
 )
 
@@ -87,12 +88,24 @@ class UrlShortenerControllerImpl(
             val h = HttpHeaders()
             val url = linkTo<UrlShortenerControllerImpl> { redirectTo(it.hash, request) }.toUri()
             h.location = url
-            val response = ShortUrlDataOut(
-                url = url,
-                properties = mapOf(
-                    "safe" to it.properties.safe
+            var response : ShortUrlDataOut
+            if (data.qr != null){
+                val qr = linkTo<QRControllerImpl> { redirectTo(it.hash, Format(), request) }.toUri()
+                response = ShortUrlDataOut(
+                    url = url,
+                    qr = qr,
+                    properties = mapOf(
+                        "safe" to it.properties.safe
+                    )
                 )
-            )
+            } else{
+                response = ShortUrlDataOut(
+                    url = url,
+                    properties = mapOf(
+                        "safe" to it.properties.safe
+                    )
+                )
+            }
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }
 }
