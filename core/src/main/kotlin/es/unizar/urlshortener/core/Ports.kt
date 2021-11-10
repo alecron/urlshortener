@@ -43,3 +43,12 @@ interface HashService {
 interface QRService{
     fun generateQR(url: String, format: Format): ByteArray
 }
+
+/**
+ * [URIReachable] is the port to the service that verifies that a URI can be reached.
+ *
+ * **Note**: It is a design decision to create this port. It could be part of the core .
+ */
+interface URIReachableService {
+    fun isReachable(url: String): Boolean
+}

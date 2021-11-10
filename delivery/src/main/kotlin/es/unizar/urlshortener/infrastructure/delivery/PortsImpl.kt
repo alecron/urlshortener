@@ -9,6 +9,9 @@ import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.CharacterSetECI
 import com.google.zxing.qrcode.QRCodeWriter
 import es.unizar.urlshortener.core.*
+//import es.unizar.urlshortener.core.HashService
+//import es.unizar.urlshortener.core.URIReachableService
+//import es.unizar.urlshortener.core.ValidatorService
 import org.apache.commons.validator.routines.UrlValidator
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
@@ -19,6 +22,15 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.imageio.ImageIO
 
+import io.ktor.client.*
+//import io.ktor.client.engine.cio.*
+//import io.ktor.client.features.*
+//import io.ktor.client.request.*
+//import io.ktor.client.statement.*
+//import io.ktor.http.*
+//import kotlinx.coroutines.runBlocking
+
+private const val CONNECTION_TIMEOUT = 3000L
 
 /**
  * Implementation of the port [ValidatorService].
@@ -38,6 +50,7 @@ class ValidatorServiceImpl : ValidatorService {
 class HashServiceImpl : HashService {
     override fun hasUrl(url: String) = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString()
 }
+
 
 /**
  * Implementation of the port [QRService]
@@ -86,5 +99,23 @@ class QRServiceImpl : QRService {
         } catch (e: IOException) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "QR image generation has failed")
         }
+    }
+}
+
+* Implementation of the port [URIReachableService].
+ */
+class URIReachableServiceImpl : URIReachableService {
+    private val client = HttpClient(CIO) {
+        install(HttpTimeout) {
+            requestTimeoutMillis = CONNECTION_TIMEOUT
+        }
+    }
+    override fun isReachable(url: String): Boolean {
+        val response: HttpResponse?
+        runBlocking {
+            response = try { client.get(url) }
+            catch (e: Exception) { null }
+        }
+        return response?.status == HttpStatusCode.OK
     }
 }

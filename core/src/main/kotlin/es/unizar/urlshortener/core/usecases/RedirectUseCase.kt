@@ -1,8 +1,7 @@
 package es.unizar.urlshortener.core.usecases
 
-import es.unizar.urlshortener.core.Redirection
-import es.unizar.urlshortener.core.RedirectionNotFound
-import es.unizar.urlshortener.core.ShortUrlRepositoryService
+import es.unizar.urlshortener.core.*
+import io.ktor.client.request.*
 
 /**
  * Given a key returns a [Redirection] that contains a [URI target][Redirection.target]
@@ -18,11 +17,16 @@ interface RedirectUseCase {
  * Implementation of [RedirectUseCase].
  */
 class RedirectUseCaseImpl(
-    private val shortUrlRepository: ShortUrlRepositoryService
+    private val shortUrlRepository: ShortUrlRepositoryService,
+    private val uRIReachableService : URIReachableService
 ) : RedirectUseCase {
-    override fun redirectTo(key: String) = shortUrlRepository
-        .findByKey(key)
-        ?.redirection
-        ?: throw RedirectionNotFound(key)
+    override fun redirectTo(key: String): Redirection {
+        val redirection : Redirection = shortUrlRepository.findByKey(key)?.redirection
+            ?: throw RedirectionNotFound(key)
+        if (!uRIReachableService.isReachable(redirection.target)) {
+            throw UrlNotReachable(redirection.target)
+        }
+        return redirection
+    }
 }
 
