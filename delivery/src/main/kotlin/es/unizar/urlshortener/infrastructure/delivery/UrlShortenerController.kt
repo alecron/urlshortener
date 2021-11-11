@@ -5,9 +5,9 @@ import es.unizar.urlshortener.core.Format
 import es.unizar.urlshortener.core.ShortUrlProperties
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import es.unizar.urlshortener.core.*
-//import es.unizar.urlshortener.core.usecases.LogClickUseCase
-//import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
-//import es.unizar.urlshortener.core.usecases.RedirectUseCase
+import es.unizar.urlshortener.core.usecases.LogClickUseCase
+import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
+import es.unizar.urlshortener.core.usecases.RedirectUseCase
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
