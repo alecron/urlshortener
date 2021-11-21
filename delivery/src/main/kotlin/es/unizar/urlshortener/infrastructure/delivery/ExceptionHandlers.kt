@@ -34,8 +34,8 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ResponseBody
     @ExceptionHandler(value = [UrlNotReachable::class])
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    protected fun urlNotReachable(ex: UrlNotReachable) = ErrorMessage(HttpStatus.NOT_FOUND.value(), ex.message)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun urlNotReachable(ex: UrlNotReachable) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
 
     @ResponseBody
     @ExceptionHandler(value = [EmptyFile::class])

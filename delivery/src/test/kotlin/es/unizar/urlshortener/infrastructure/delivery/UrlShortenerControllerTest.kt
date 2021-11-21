@@ -22,7 +22,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 @WebMvcTest
 @ContextConfiguration(classes = [
     UrlShortenerControllerImpl::class,
-    RestResponseEntityExceptionHandler::class])
+    RestResponseEntityExceptionHandler::class,
+    ValidatorServiceImpl::class,
+    URIReachableServiceImpl::class,
+    QRServiceImpl::class])
 class UrlShortenerControllerTest {
 
     @Autowired
