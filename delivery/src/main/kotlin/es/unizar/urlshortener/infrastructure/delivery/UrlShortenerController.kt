@@ -78,8 +78,7 @@ class UrlShortenerControllerImpl(
     val redirectUseCase: RedirectUseCase,
     val logClickUseCase: LogClickUseCase,
     val createShortUrlUseCase: CreateShortUrlUseCase,
-    private val validatorService: ValidatorService,
-    private val uRIReachableService: URIReachableService
+    private val validatorService: ValidatorService
 ) : UrlShortenerController {
 
     @GetMapping("/tiny-{id:.*}")
@@ -147,8 +146,6 @@ class UrlShortenerControllerImpl(
                     var commentRecord = ""
                     if(!validatorService.isValid(urlRecord)){
                         commentRecord = "La URI no es valida "
-                    } else if(!uRIReachableService.isReachable(urlRecord)){
-                        commentRecord = commentRecord +  " La URI no es alcanzable"
                     } else {
                        val shorRecord = createShortUrlUseCase.create(
                                 url = csvRecord.get(0),

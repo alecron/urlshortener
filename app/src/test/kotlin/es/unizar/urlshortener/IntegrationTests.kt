@@ -1,6 +1,6 @@
 package es.unizar.urlshortener
 
-import es.unizar.urlshortener.infrastructure.delivery.ShortUrlDataOut
+import es.unizar.urlshortener.infrastructure.delivery.*
 import org.apache.http.impl.client.HttpClientBuilder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -15,6 +15,9 @@ import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.http.*
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.jdbc.JdbcTestUtils
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
