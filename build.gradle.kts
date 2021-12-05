@@ -33,9 +33,16 @@ subprojects {
 }
 
 project(":core") {
+    apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+    apply(plugin = "org.springframework.boot")
+    apply(plugin = "io.spring.dependency-management")
     dependencies {
         "implementation"("io.ktor:ktor-client-core:1.6.5")
         "implementation" ("io.ktor:ktor-client-cio:1.6.5")
+        "implementation"("org.springframework.boot:spring-boot-starter")
+    }
+    tasks.getByName<BootJar>("bootJar") {
+        enabled = false
     }
 }
 

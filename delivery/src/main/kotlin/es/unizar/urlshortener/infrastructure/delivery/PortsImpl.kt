@@ -10,7 +10,6 @@ import com.google.zxing.common.CharacterSetECI
 import com.google.zxing.qrcode.QRCodeWriter
 import es.unizar.urlshortener.core.*
 import es.unizar.urlshortener.core.HashService
-import es.unizar.urlshortener.core.URIReachableService
 import es.unizar.urlshortener.core.ValidatorService
 import org.apache.commons.validator.routines.UrlValidator
 import org.springframework.http.HttpStatus
@@ -28,14 +27,31 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
+import org.springframework.scheduling.annotation.Async
+import java.util.concurrent.CompletableFuture
 
 private const val CONNECTION_TIMEOUT = 3000L
 
 /**
  * Implementation of the port [ValidatorService].
  */
-class ValidatorServiceImpl : ValidatorService {
+open class ValidatorServiceImpl : ValidatorService {
     override fun isValid(url: String) = urlValidator.isValid(url)
+
+    private val client = HttpClient(CIO) {
+        install(HttpTimeout) {
+            requestTimeoutMillis = CONNECTION_TIMEOUT
+        }
+    }
+    @Async
+    open override fun isReachable(url : String) : CompletableFuture<Boolean> {
+        val response: HttpResponse?
+        runBlocking {
+            response = try { client.get(url) }
+            catch (e: Exception) { null }
+        }
+        return CompletableFuture.completedFuture(response?.status == HttpStatusCode.OK)
+    }
 
     companion object {
         val urlValidator = UrlValidator(arrayOf("http", "https"))
@@ -101,21 +117,4 @@ class QRServiceImpl : QRService {
     }
 }
 
-/*
- * Implementation of the port [URIReachableService].
- */
-class URIReachableServiceImpl : URIReachableService {
-    private val client = HttpClient(CIO) {
-        install(HttpTimeout) {
-            requestTimeoutMillis = CONNECTION_TIMEOUT
-        }
-    }
-    override fun isReachable(url: String): Boolean {
-        val response: HttpResponse?
-        runBlocking {
-            response = try { client.get(url) }
-            catch (e: Exception) { null }
-        }
-        return response?.status == HttpStatusCode.OK
-    }
-}
+

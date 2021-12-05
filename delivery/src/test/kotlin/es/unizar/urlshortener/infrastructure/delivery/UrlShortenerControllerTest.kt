@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
     UrlShortenerControllerImpl::class,
     RestResponseEntityExceptionHandler::class,
     ValidatorServiceImpl::class,
-    URIReachableServiceImpl::class,
     QRServiceImpl::class])
 class UrlShortenerControllerTest {
 
