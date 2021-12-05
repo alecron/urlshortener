@@ -22,6 +22,11 @@ data class ShortUrl(
     val properties: ShortUrlProperties = ShortUrlProperties()
 )
 
+data class ShortUrlCSV(
+        val url: String? = null,
+        val shortUrl: ShortUrl
+)
+
 /**
  * A [Redirection] specifies the [target] and the [status code][mode] of a redirection.
  * By default, the [status code][mode] is 307 TEMPORARY REDIRECT.

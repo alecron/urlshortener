@@ -34,9 +34,9 @@ class ApplicationConfiguration(
     @Bean
     fun taskExecutor(): Executor? {
         val executor = ThreadPoolTaskExecutor()
-        executor.corePoolSize = 4;
-        executor.maxPoolSize = 10;
-        executor.setQueueCapacity(150);
+        executor.corePoolSize = 4
+        executor.maxPoolSize = 10
+        executor.setQueueCapacity(150)
         executor.initialize()
         return executor
     }
@@ -66,4 +66,7 @@ class ApplicationConfiguration(
   
     @Bean
     fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService())
+
+    @Bean
+    fun createCsvUseCase() = CreateCsvUseCaseImpl(createShortUrlUseCase(), validatorService())
 }
