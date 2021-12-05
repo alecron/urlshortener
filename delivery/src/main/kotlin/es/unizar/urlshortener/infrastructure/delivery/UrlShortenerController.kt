@@ -45,6 +45,8 @@ interface UrlShortenerController {
      */
     fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
 
+
+    fun csvProcessor(file : MultipartFile, qr : Boolean, request: HttpServletRequest) : ResponseEntity<Resource>
 }
 
 /**
@@ -123,7 +125,7 @@ class UrlShortenerControllerImpl(
         }
 
     @PostMapping("/csv")
-    fun csvProcessor(@RequestParam("file") file : MultipartFile, @RequestParam("qr") qr : Boolean, request: HttpServletRequest) : ResponseEntity<Resource>  {
+    override fun csvProcessor(@RequestParam("file") file : MultipartFile, @RequestParam("qr") qr : Boolean, request: HttpServletRequest) : ResponseEntity<Resource>  {
         if(file.isEmpty){
             throw EmptyFile(file.name)
         } else{

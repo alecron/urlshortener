@@ -1,10 +1,8 @@
 package es.unizar.urlshortener.core.usecases
 
-import es.unizar.urlshortener.core.ShortUrl
 import es.unizar.urlshortener.core.ShortUrlCSV
 import es.unizar.urlshortener.core.ShortUrlProperties
 import es.unizar.urlshortener.core.ValidatorService
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
 
 
 
@@ -12,9 +10,13 @@ interface CreateCsvUseCase {
     fun transform(url:String, remoteAddr:String):Any
 }
 
+/**
+ * implementation of [CreateCsvUseCase]
+ */
 class CreateCsvUseCaseImpl (
-        val createShortUrlUseCase: CreateShortUrlUseCase,
-        private val validatorService: ValidatorService) : CreateCsvUseCase {
+        private val createShortUrlUseCase: CreateShortUrlUseCase,
+        private val validatorService: ValidatorService
+) : CreateCsvUseCase {
     override fun transform(url:String, remoteAddr:String):Any {
         // String -> Comentario o ShortURL
         if(!validatorService.isValid(url)){
