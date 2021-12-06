@@ -37,6 +37,7 @@ project(":core") {
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
     dependencies {
+        "implementation"("org.springframework.boot:spring-boot-starter-amqp")
         "implementation"("io.ktor:ktor-client-core:1.6.5")
         "implementation" ("io.ktor:ktor-client-cio:1.6.5")
         "implementation"("org.springframework.boot:spring-boot-starter")
@@ -77,6 +78,7 @@ project(":delivery") {
         "implementation" ("io.ktor:ktor-client-cio:1.6.5")
         //CSV
         "implementation" ("org.apache.commons:commons-csv:1.5")
+        "implementation"("org.springframework.boot:spring-boot-starter-amqp")
 
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         "testImplementation"("org.mockito.kotlin:mockito-kotlin:3.2.0")
@@ -97,6 +99,7 @@ project(":app") {
         "implementation"("org.springframework.boot:spring-boot-starter")
         "implementation"( "org.webjars:bootstrap:3.3.5")
         "implementation"("org.webjars:jquery:2.1.4")
+        "implementation"("org.springframework.boot:spring-boot-starter-amqp")
 
         "runtimeOnly"("org.hsqldb:hsqldb")
 
