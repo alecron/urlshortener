@@ -44,19 +44,18 @@ class HashServiceImpl : HashService {
  */
 class QRServiceImpl : QRService {
     override fun generateQR(url: String, format: Format): ByteArray {
-        println("Estoy en QRService")
         // Check Size
         if (format.height <= 0 || format.width <= 0) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Height and width must be greater than 0")
+            throw InvalidQRParameter("Height and width must be greater than 0")
         }
         // Check colors
         val hexRegex = Regex("0x[0-9a-fA-F]{8}")
         if (!format.color.matches(hexRegex) || !format.background.matches(hexRegex)) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Colors must be in hexadecimal format.")
+            throw InvalidQRParameter("Colors must be in hexadecimal format.")
         }
         // Check response type
         if (!arrayListOf("PNG", "JPEG").contains(format.typeImage)){
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "The image type must be 'PNG' or 'JPEG'.")
+            throw InvalidQRParameter("The image type must be 'PNG' or 'JPEG'.")
         }
         // Add options
         val hints = EnumMap<EncodeHintType, Any>(EncodeHintType::class.java)
@@ -76,7 +75,7 @@ class QRServiceImpl : QRService {
                     MatrixToImageConfig(color, background)
             )
         } catch (e: WriterException) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "QR encoding has failed")
+            throw QRFailure("QR encoding")
         }
 
         try {
@@ -84,7 +83,7 @@ class QRServiceImpl : QRService {
             ImageIO.write(qrImage, format.typeImage, byteArrayOutputStream)
             return byteArrayOutputStream.toByteArray()
         } catch (e: IOException) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "QR image generation has failed")
+            throw QRFailure("QR image generation")
         }
     }
 }

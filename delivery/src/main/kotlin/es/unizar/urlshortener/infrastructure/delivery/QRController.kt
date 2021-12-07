@@ -21,7 +21,8 @@ interface QRController {
      *
      * **Note**: Delivery of use cases [RedirectUseCase] and [LogClickUseCase].
      */
-    fun redirectTo(id: String, format: Format, request: HttpServletRequest): ResponseEntity<ByteArray>
+    fun redirectTo(id: String, height: Int, width: Int, color: String, background: String,
+                   typeImage: String, errorCorrectionLevel: String, request: HttpServletRequest): ResponseEntity<ByteArray>
 }
 
 /**
@@ -36,8 +37,17 @@ class QRControllerImpl(
 ) : QRController {
 
     @GetMapping("/qr/{id}", produces = [ MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_JSON_VALUE ])
-    override fun redirectTo(@PathVariable id: String, format: Format, request: HttpServletRequest): ResponseEntity<ByteArray> =
+    override fun redirectTo(@PathVariable id: String,
+                            @RequestParam(required = false, defaultValue = "500") height: Int,
+                            @RequestParam(required = false, defaultValue = "500") width: Int,
+                            @RequestParam(required = false, defaultValue = "0xFF000000") color: String,
+                            @RequestParam(required = false, defaultValue = "0xFFFFFFFF") background: String,
+                            @RequestParam(required = false, defaultValue = "PNG") typeImage: String,
+                            @RequestParam(required = false, defaultValue = "L") errorCorrectionLevel: String,
+                            request: HttpServletRequest): ResponseEntity<ByteArray> {
+        val format = Format(height, width, color, background, typeImage, errorCorrectionLevel)
         qrUrlUseCase.generateQR(id, format).let{
-            ResponseEntity.status(HttpStatus.OK).body(it)
+            return ResponseEntity.status(HttpStatus.OK).body(it)
         }
+    }
 }
