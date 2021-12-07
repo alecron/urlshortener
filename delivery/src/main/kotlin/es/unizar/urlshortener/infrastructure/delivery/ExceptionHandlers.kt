@@ -4,6 +4,8 @@ import es.unizar.urlshortener.core.InvalidQRParameter
 import es.unizar.urlshortener.core.InvalidUrlException
 import es.unizar.urlshortener.core.QRFailure
 import es.unizar.urlshortener.core.RedirectionNotFound
+import es.unizar.urlshortener.core.UrlNotReachable
+import es.unizar.urlshortener.core.EmptyFile
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -41,6 +43,16 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [QRFailure::class])
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     protected fun qrFailure(ex: QRFailure) = ErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.message)
+    
+    @ResponseBody
+    @ExceptionHandler(value = [UrlNotReachable::class])
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    protected fun urlNotReachable(ex: UrlNotReachable) = ErrorMessage(HttpStatus.NOT_FOUND.value(), ex.message)
+
+    @ResponseBody
+    @ExceptionHandler(value = [EmptyFile::class])
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun emptyFile(ex: EmptyFile) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
 }
 
 data class ErrorMessage(
