@@ -36,6 +36,7 @@ project(":core") {
     dependencies {
         "implementation"("io.ktor:ktor-client-core:1.6.5")
         "implementation" ("io.ktor:ktor-client-cio:1.6.5")
+        "implementation" ("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.+")
     }
 }
 
@@ -70,6 +71,8 @@ project(":delivery") {
         "implementation" ("io.ktor:ktor-client-cio:1.6.5")
         //CSV
         "implementation" ("org.apache.commons:commons-csv:1.5")
+        //Rabbitmq
+        "implementation"("org.springframework.boot:spring-boot-starter-amqp")
 
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         "testImplementation"("org.mockito.kotlin:mockito-kotlin:3.2.0")
@@ -99,5 +102,8 @@ project(":app") {
         "testImplementation"("org.mockito.kotlin:mockito-kotlin:3.2.0")
         "testImplementation"("com.fasterxml.jackson.module:jackson-module-kotlin")
         "testImplementation"("org.apache.httpcomponents:httpclient")
+
+        //Rabbitmq
+        "implementation"("org.springframework.boot:spring-boot-starter-amqp")
     }
 }

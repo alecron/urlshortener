@@ -1,5 +1,6 @@
 package es.unizar.urlshortener.infrastructure.repositories
 
+import es.unizar.urlshortener.core.Format
 import java.time.OffsetDateTime
 import java.util.*
 import javax.persistence.*
@@ -38,4 +39,20 @@ class ShortUrlEntity(
     val safe: Boolean,
     val ip: String?,
     val country: String?
+)
+
+@Entity
+@Table(name = "qrcode")
+class QRCodeEntity(
+    @Id
+    val hash: String,
+    val height: Int,
+    val width: Int,
+    val color: String,
+    val background: String,
+    val typeImage: String,
+    val errorCorrectionLevel: String,
+    @Lob
+    @Column(name = "qrCode", columnDefinition="BLOB")
+    val qrCode: ByteArray?
 )

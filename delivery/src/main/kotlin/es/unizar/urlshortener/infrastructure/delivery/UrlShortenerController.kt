@@ -5,12 +5,14 @@ import es.unizar.urlshortener.core.Format
 import es.unizar.urlshortener.core.ShortUrlProperties
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import es.unizar.urlshortener.core.*
-//import es.unizar.urlshortener.core.usecases.LogClickUseCase
-//import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
-//import es.unizar.urlshortener.core.usecases.RedirectUseCase
+import es.unizar.urlshortener.core.usecases.LogClickUseCase
+import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
+import es.unizar.urlshortener.core.usecases.RedirectUseCase
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
+import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.InputStreamResource
 import org.springframework.core.io.InputStreamSource
 import org.springframework.core.io.Resource
@@ -26,6 +28,7 @@ import java.io.*
 import java.lang.System.out
 import java.net.URI
 import java.nio.file.Files
+import java.util.*
 import javax.servlet.http.HttpServletRequest
 
 /**

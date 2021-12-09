@@ -23,12 +23,12 @@ import java.util.*
 import javax.imageio.ImageIO
 
 import io.ktor.client.*
-//import io.ktor.client.engine.cio.*
-//import io.ktor.client.features.*
-//import io.ktor.client.request.*
-//import io.ktor.client.statement.*
-//import io.ktor.http.*
-//import kotlinx.coroutines.runBlocking
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import kotlinx.coroutines.runBlocking
 
 private const val CONNECTION_TIMEOUT = 3000L
 
@@ -101,7 +101,7 @@ class QRServiceImpl : QRService {
     }
 }
 
-* Implementation of the port [URIReachableService].
+/* Implementation of the port [URIReachableService].
  */
 class URIReachableServiceImpl : URIReachableService {
     private val client = HttpClient(CIO) {
