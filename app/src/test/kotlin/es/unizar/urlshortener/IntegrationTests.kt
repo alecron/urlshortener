@@ -1,6 +1,6 @@
 package es.unizar.urlshortener
 
-import es.unizar.urlshortener.infrastructure.delivery.*
+import es.unizar.urlshortener.infrastructure.delivery.ShortUrlDataOut
 import org.apache.http.impl.client.HttpClientBuilder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -10,19 +10,21 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
 import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.http.*
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.scheduling.annotation.EnableAsync
-import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.ContextConfiguration
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.test.jdbc.JdbcTestUtils
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
-import org.springframework.web.client.RestTemplate
 import java.net.URI
+import java.util.concurrent.TimeUnit
+
+/*
+* Informacion para tests que emplean funciones asincronas:
+*   https://newbedev.com/junit-testing-a-spring-async-void-service-method
+*/
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -35,6 +37,9 @@ class HttpRequestTest {
 
     @Autowired
     private lateinit var restTemplate: TestRestTemplate
+
+    @Autowired
+    private val executor: ThreadPoolTaskExecutor? = null
 
     @BeforeEach
     fun setup() {
@@ -113,9 +118,11 @@ class HttpRequestTest {
         val data: MultiValueMap<String, String> = LinkedMultiValueMap()
         data["url"] = url
 
-        return restTemplate.postForEntity(
+        val response =  restTemplate.postForEntity(
             "http://localhost:$port/api/link",
             HttpEntity(data, headers), ShortUrlDataOut::class.java
         )
+        executor?.getThreadPoolExecutor()?.awaitTermination(3, TimeUnit.SECONDS);
+        return response
     }
 }
