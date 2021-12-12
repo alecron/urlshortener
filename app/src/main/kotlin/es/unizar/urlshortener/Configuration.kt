@@ -31,7 +31,7 @@ class ApplicationConfiguration(
     @Autowired val clickEntityRepository: ClickEntityRepository
 )  {
 
-    @Bean
+    @Bean(name = ["taskExecutorReachable"])
     fun taskExecutor(): Executor? {
         val executor = ThreadPoolTaskExecutor()
         executor.corePoolSize = 4

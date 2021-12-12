@@ -43,7 +43,7 @@ open class ValidatorServiceImpl : ValidatorService {
             requestTimeoutMillis = CONNECTION_TIMEOUT
         }
     }
-    @Async
+    @Async("taskExecutorReachable")
     open override fun isReachable(url : String) : CompletableFuture<Boolean> {
         val response: HttpResponse?
         runBlocking {

@@ -1,9 +1,6 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
-import es.unizar.urlshortener.core.InvalidUrlException
-import es.unizar.urlshortener.core.RedirectionNotFound
-import es.unizar.urlshortener.core.UrlNotReachable
-import es.unizar.urlshortener.core.EmptyFile
+import es.unizar.urlshortener.core.*
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
