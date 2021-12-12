@@ -22,6 +22,7 @@ data class ShortUrl(
     val properties: ShortUrlProperties = ShortUrlProperties()
 )
 
+
 data class QRCode(
         val hash: String,
         val format: Format = Format(),
@@ -31,6 +32,11 @@ data class QRCode(
 data class QRCode2(
         @JsonProperty("hash") val hash: String,
         @JsonProperty("format") val format: Format = Format()
+)
+
+data class ShortUrlCSV(
+        val url: String? = null,
+        val shortUrl: ShortUrl
 )
 
 /**
@@ -49,6 +55,7 @@ data class ShortUrlProperties(
     val ip: String? = null,
     val sponsor: String? = null,
     val safe: Boolean = true,
+    var reachable: Boolean = false,
     val owner: String? = null,
     val country: String? = null
 )
