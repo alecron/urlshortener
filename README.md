@@ -189,7 +189,27 @@ If you click on the qr URI address, you can see the QR code.
 
 #### Example with format parameter:
 
-AUN NO FUNCIONA. Pongo como imagen un ejemplo de resultado que deberia de generar.
+```shell
+curl -v http://localhost:8080/qr/6bb9db44?color=0xFFFF6666\&background=0xFFFFCCCC --output QRCode6bb9db44WithFormat.png
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 127.0.0.1...
+* TCP_NODELAY set
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+> GET /qr/6bb9db44?color=0xFFFF6666&background=0xFFFFCCCC HTTP/1.1 
+> Host: localhost:8080
+> User-Agent: curl/7.58.0
+> Accept: */*
+>
+< HTTP/1.1 200
+< Content-Type: image/png
+< Content-Length: 13686
+< Date: Tue, 07 Dec 2021 15:05:48 GMT
+<
+{ [13686 bytes data]
+100 13686  100 13686    0     0   107k      0 --:--:-- --:--:-- --:--:--  108k
+* Connection #0 to host localhost left intact
+```
 
 The output of the GET request has been output to the file QRCode6bb9db44WithFormat.png
 
@@ -228,7 +248,6 @@ If you open this file, you can see the QR code.
 
 ### FALTA DE HACER
 
-* Arreglar: Que se pueda pasar el formato de forma opcional
 * Hacer: Si alguna de las dos peticiones anteriores devuelve errores de tipo 400 por más de un motivo deberá devolver un objeto JSON especificando el motivo concreto del error el usuario. 
 
   Ejemplo:

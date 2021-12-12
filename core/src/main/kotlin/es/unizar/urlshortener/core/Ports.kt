@@ -18,6 +18,11 @@ interface ShortUrlRepositoryService {
     fun save(su: ShortUrl): ShortUrl
 }
 
+interface QRCodeRepositoryService {
+    fun findByKey(id: String): QRCode?
+    fun save(qrCode: QRCode): QRCode
+}
+
 /**
  * [ValidatorService] is the port to the service that validates if an url can be shortened.
  *

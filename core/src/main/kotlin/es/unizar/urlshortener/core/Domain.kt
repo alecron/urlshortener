@@ -1,7 +1,7 @@
 package es.unizar.urlshortener.core
 
 import java.time.OffsetDateTime
-import java.util.*
+import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
  * A [Click] captures a request of redirection of a [ShortUrl] identified by its [hash].
@@ -20,6 +20,18 @@ data class ShortUrl(
     val redirection: Redirection,
     val created: OffsetDateTime = OffsetDateTime.now(),
     val properties: ShortUrlProperties = ShortUrlProperties()
+)
+
+
+data class QRCode(
+        val hash: String,
+        val format: Format = Format(),
+        val qrCode: ByteArray? = null
+)
+
+data class QRCode2(
+        @JsonProperty("hash") val hash: String,
+        @JsonProperty("format") val format: Format = Format()
 )
 
 data class ShortUrlCSV(

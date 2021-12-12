@@ -11,6 +11,10 @@ interface ShortUrlEntityRepository : JpaRepository<ShortUrlEntity, String> {
     fun findByHash(hash: String): ShortUrlEntity?
 }
 
+interface QRCodeEntityRepository : JpaRepository<QRCodeEntity, String> {
+    fun findByHash(hash: String): QRCodeEntity?
+}
+
 /**
  * Specification of the repository of [ClickEntity].
  *
