@@ -78,7 +78,7 @@ data class ShortUrlDataOut(
  * Data returned after getting the information of a short url.
  */
 data class ShortUrlDataInfo(
-    val click: ClickEntity
+    val click: List<ClickEntity>
 )
 
 
@@ -112,8 +112,10 @@ class UrlShortenerControllerImpl(
     @GetMapping("/{id:.*}.json")
     override fun getInfo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ShortUrlDataInfo> =
         redirectUseCase.redirectTo(id).let {
+            val browser = getClientBrowser()
+            val platform =  getClientPlatform()
             val h = HttpHeaders()
-            val response = ShortUrlDataInfo(browser = it.browser, platform = it.platform, uriDestino=URI.create(it.uri)) 
+            val response = ShortUrlDataInfo(browser, platform)
             return ResponseEntity<ShortUrlDataInfo>(response, h, HttpStatus.OK)
         }
            
