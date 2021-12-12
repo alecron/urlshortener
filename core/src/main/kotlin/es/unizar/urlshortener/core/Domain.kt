@@ -68,3 +68,13 @@ data class Format (
         val typeImage: String = "PNG",
         val errorCorrectionLevel: String = "L"
 )
+
+
+/*
+ * A [ShortUrlInfo] contains information about [ShortUrl]
+ */
+data class ShortUrlInfo(
+    val browser: String,
+    val platform: String,
+    val uri: String
+)
