@@ -64,8 +64,8 @@ class ApplicationConfiguration(
     fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
 
     @Bean
-    fun qrUrlUseCase() = QRUrlUseCaseImpl(shortUrlRepositoryService(), uRIReachableService(), qrService(), qrCodeRepositoryService())
-  
+    fun qrUrlUseCase() = QRUrlUseCaseImpl(shortUrlRepositoryService(), qrCodeRepositoryService())
+
     @Bean
     fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService())
 
