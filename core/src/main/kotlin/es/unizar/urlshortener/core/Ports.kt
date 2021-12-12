@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage
  */
 interface ClickRepositoryService {
     fun save(cl: Click): Click
+    fun findAllByHash(hash: String): List<Click>
 }
 
 /**

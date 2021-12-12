@@ -18,5 +18,5 @@ interface ShortUrlEntityRepository : JpaRepository<ShortUrlEntity, String> {
  */
 interface ClickEntityRepository : JpaRepository<ClickEntity, Long>{
     //Revisar sintaxis
-    fun findAllByHash(hash: String) : List<Click?>
+    fun findAllByHash(hash: String) : List<ClickEntity>
 }

@@ -4,10 +4,9 @@ import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.Format
 import es.unizar.urlshortener.core.ShortUrlProperties
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import es.unizar.urlshortener.core.*
-import es.unizar.urlshortener.core.usecases.LogClickUseCase
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
-import es.unizar.urlshortener.core.usecases.RedirectUseCase
+import es.unizar.urlshortener.core.usecases.*
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
@@ -52,7 +51,7 @@ interface UrlShortenerController {
      *
      * **Note**: Delivery of use case [InfoShortUrlUseCase]
      */
-    fun getInfo(id: String): ResponseEntity<ShortUrlDataInfo>
+    fun getInfo(id: String, request: HttpServletRequest): ResponseEntity<String>
 
 }
 
@@ -74,13 +73,6 @@ data class ShortUrlDataOut(
     val properties: Map<String, Any> = emptyMap()
 )
 
-/**
- * Data returned after getting the information of a short url.
- */
-data class ShortUrlDataInfo(
-    val click: List<ClickEntity>
-)
-
 
 /**
  * The implementation of the controller.
@@ -92,7 +84,7 @@ class UrlShortenerControllerImpl(
     val redirectUseCase: RedirectUseCase,
     val logClickUseCase: LogClickUseCase,
     val createShortUrlUseCase: CreateShortUrlUseCase,
-    val infoShortUrlUseCase: InfoShortUrlUseCase, 
+    val infoShortUrlUseCase: InfoShortUrlUseCase,
     private val validatorService: ValidatorService,
     private val uRIReachableService: URIReachableService
 ) : UrlShortenerController {
@@ -102,21 +94,19 @@ class UrlShortenerControllerImpl(
          redirectUseCase.redirectTo(id).let {
             val browser = getClientBrowser(request)
             val platform = getClientPlatform(request)
-            logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr, browser, platform))
+            logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr, platform = platform, browser = browser))
             val h = HttpHeaders()
             h.location = URI.create(it.target)
             ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
         }
 
 
-    @GetMapping("/{id:.*}.json")
-    override fun getInfo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ShortUrlDataInfo> =
+    @GetMapping("/{id:.*}-json")
+    override fun getInfo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<String> =
         redirectUseCase.redirectTo(id).let {
-            val browser = getClientBrowser()
-            val platform =  getClientPlatform()
             val h = HttpHeaders()
-            val response = ShortUrlDataInfo(browser, platform)
-            return ResponseEntity<ShortUrlDataInfo>(response, h, HttpStatus.OK)
+            val response = infoShortUrlUseCase.info(id)
+            return ResponseEntity<String>(response, h, HttpStatus.OK)
         }
            
 
@@ -158,7 +148,6 @@ class UrlShortenerControllerImpl(
         if(file.isEmpty){
             throw EmptyFile(file.name)
         } else{
-
             val reader = BufferedReader(InputStreamReader(file.inputStream))
             val csvParser = CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(',') )
             val byteArrayOutputStream = ByteArrayOutputStream()
@@ -217,6 +206,8 @@ class UrlShortenerControllerImpl(
         val browserDetails: String = request.getHeader("User-Agent")
         val user: String = browserDetails.toLowerCase()
         var browser = ""
+
+        println(browserDetails)
 
         if (user.contains("msie")) {
             val substring: String = browserDetails.substring(browserDetails.indexOf("MSIE")).split(";").get(0)
