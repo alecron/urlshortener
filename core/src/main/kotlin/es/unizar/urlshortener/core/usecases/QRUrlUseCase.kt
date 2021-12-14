@@ -22,12 +22,13 @@ class QRUrlUseCaseImpl(
 ) : QRUrlUseCase {
     override fun generateQR(id: String): ByteArray {
         //Check id/hash
-        val redirection: Redirection = shortUrlRepository.findByKey(id)?.redirection
+        val su : ShortUrl? = shortUrlRepository.findByKey(id)
+        val redirection : Redirection = su?.redirection
                 ?: throw RedirectionNotFound(id)
         //Check url is reachable
-        /*if (!uRIReachableService.isReachable(redirection.target)) {
+        if (!su.properties.reachable) {
             throw UrlNotReachable(redirection.target)
-        }*/
+        }
         //if the hash exists in the db, the program returns the qr code stored in the db
         //in other case, the program generates the qr code with the default format
         return qrCodeRepository.findByKey(id)?.qrCode
