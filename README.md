@@ -251,6 +251,7 @@ If you open this file, you can see the QR code.
 ### FALTA DE HACER
 * Cambiar tipo de dato de rabbit por el de QRCode y quitar QRCode2.
 * Añadir ESTADO en el mensaje guardado en bd para poder coger el formato cuando no se ha consumido el mensaje por rabbit y autogenerarlo con dicho formato.
+* Modificar estilo del front del formato del codigo qr
 * Hacer tests para todos los casos:
   * Comprobando que genera el codigo qr por defecto cuando no ha sido generado aun por rabbit y quitar wait.
   * Comprobar peticion POST sin parametro qr
