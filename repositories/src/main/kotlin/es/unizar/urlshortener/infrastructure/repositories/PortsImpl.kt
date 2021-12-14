@@ -22,6 +22,9 @@ class ShortUrlRepositoryServiceImpl(
     override fun save(su: ShortUrl): ShortUrl = shortUrlEntityRepository.save(su.toEntity()).toDomain()
 }
 
+/**
+ * Implementation of the port [QRCodeRepositoryService].
+ */
 class QRCodeRepositoryServiceImpl(
         private val qrCodeEntityRepository: QRCodeEntityRepository
 ) : QRCodeRepositoryService {

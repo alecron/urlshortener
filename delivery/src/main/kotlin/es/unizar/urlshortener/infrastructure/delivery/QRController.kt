@@ -25,8 +25,7 @@ interface QRController {
      *
      * **Note**: Delivery of use cases [RedirectUseCase] and [LogClickUseCase].
      */
-    fun redirectTo(id: String, height: Int, width: Int, color: String, background: String,
-                   typeImage: String, errorCorrectionLevel: String, request: HttpServletRequest): ResponseEntity<ByteArray>
+    fun redirectTo(id: String, request: HttpServletRequest): ResponseEntity<ByteArray>
 }
 
 /**
@@ -40,21 +39,9 @@ class QRControllerImpl(
     val qrUrlUseCase : QRUrlUseCase
 ) : QRController {
 
-    @Autowired
-    private val template: RabbitTemplate? = null
-
     @GetMapping("/qr/{id}", produces = [ MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_JSON_VALUE ])
-    override fun redirectTo(@PathVariable id: String,
-                            @RequestParam(required = false, defaultValue = "500") height: Int,
-                            @RequestParam(required = false, defaultValue = "500") width: Int,
-                            @RequestParam(required = false, defaultValue = "0xFF000000") color: String,
-                            @RequestParam(required = false, defaultValue = "0xFFFFFFFF") background: String,
-                            @RequestParam(required = false, defaultValue = "PNG") typeImage: String,
-                            @RequestParam(required = false, defaultValue = "L") errorCorrectionLevel: String,
-                            request: HttpServletRequest): ResponseEntity<ByteArray> {
-        val format = Format(height, width, color, background, typeImage, errorCorrectionLevel)
-        template?.convertAndSend("QR_exchange", "QR_routingKey", QRCode2(id, format))
-        qrUrlUseCase.generateQR(id, format).let{
+    override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ByteArray> {
+        qrUrlUseCase.generateQR(id).let{
             return ResponseEntity.status(HttpStatus.OK).body(it)
         }
     }

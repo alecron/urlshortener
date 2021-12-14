@@ -11,6 +11,11 @@ interface ShortUrlEntityRepository : JpaRepository<ShortUrlEntity, String> {
     fun findByHash(hash: String): ShortUrlEntity?
 }
 
+/**
+ * Specification of the repository of [QRCodeEntity].
+ *
+ * **Note**: Spring Boot is able to discover this [JpaRepository] without further configuration.
+ */
 interface QRCodeEntityRepository : JpaRepository<QRCodeEntity, String> {
     fun findByHash(hash: String): QRCodeEntity?
 }

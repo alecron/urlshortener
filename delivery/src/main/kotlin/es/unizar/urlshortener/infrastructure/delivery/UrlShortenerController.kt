@@ -61,6 +61,12 @@ interface UrlShortenerController {
 data class ShortUrlDataIn(
     val url: String,
     val qr: Boolean? = null,
+    val qrHeight: Int? = null,
+    val qrWidth: Int? = null,
+    val qrColor: String? = null,
+    val qrBackground: String? = null,
+    val qrTypeImage: String? = null,
+    val qrErrorCorrectionLevel: String? = null,
     val sponsor: String? = null
 )
 
@@ -88,6 +94,9 @@ class UrlShortenerControllerImpl(
     private val validatorService: ValidatorService
 ) : UrlShortenerController {
 
+    @Autowired
+    private val template: RabbitTemplate? = null
+
     @GetMapping("/tiny-{id:.*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void> =
         redirectUseCase.redirectTo(id).let {
@@ -111,10 +120,22 @@ class UrlShortenerControllerImpl(
             h.location = url
             var response : ShortUrlDataOut
 
-            if (data.qr != null && data.qr == true){
-                val format = Format()
-                val qr = linkTo<QRControllerImpl> { redirectTo(it.hash, format.height, format.width, format.color, format.background, format.typeImage, format.errorCorrectionLevel, request) }.toUri()
+            if (data.qr != null && data.qr == true){    //Si se pide generar el qr
+                //Fijar los valores del formato: usando lo pasado en parámetros y lo establecido por defecto.
+                var format = Format()
+                val height: Int = data.qrHeight ?: format.height
+                val width: Int = data.qrWidth ?: format.width
+                val color: String = data.qrColor ?: format.color
+                val background: String = data.qrBackground ?: format.background
+                val typeImage: String = data.qrTypeImage ?: format.typeImage
+                val errorCorrectionLevel: String = data.qrErrorCorrectionLevel ?: format.errorCorrectionLevel
+                format = Format(height, width, color, background, typeImage, errorCorrectionLevel)
 
+                //Encolar tarea de generar el codigo qr con el formato especificado usando rabbitmq
+                template?.convertAndSend("QR_exchange", "QR_routingKey", QRCode2(it.hash, format))
+
+                //Url del código qr
+                val qr = linkTo<QRControllerImpl> { redirectTo(it.hash, request) }.toUri()
                 response = ShortUrlDataOut(
                     url = url,
                     qr = qr,
@@ -172,7 +193,7 @@ class UrlShortenerControllerImpl(
                     val urlHash = it.shortUrl.hash
                     val uriRecord = linkTo<UrlShortenerControllerImpl> { redirectTo(urlHash, request) }.toString()
                     var qrRecord = ""
-                    if(qr) qrRecord = linkTo<QRControllerImpl> { redirectTo(urlHash, Format(), request) }.toString()
+                    if(qr) qrRecord = linkTo<QRControllerImpl> { redirectTo(urlHash, request) }.toString()
                     if(firstURL == null){
                         // Se guarda la primera URI acortada
                         firstURL = linkTo<UrlShortenerControllerImpl> { redirectTo(urlHash, request) }.toUri()

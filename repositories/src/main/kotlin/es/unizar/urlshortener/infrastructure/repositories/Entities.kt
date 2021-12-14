@@ -42,6 +42,9 @@ class ShortUrlEntity(
     val country: String?
 )
 
+/**
+ * The [QRCodeEntity] entity stores qr codes.
+ */
 @Entity
 @Table(name = "qrcode")
 class QRCodeEntity(

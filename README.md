@@ -157,7 +157,7 @@ $ curl -v -d "url=http://www.unizar.es/" http://localhost:8080/api/link
 ```
 If you don't add de qr parameter, the http response will be the same as getting a shortened url
 
-#### Example with qr parameter:
+#### Example with qr parameter and without format parameters:
 
 ```shell
 $ curl -v -d "url=http://www.unizar.es/&qr=true" http://localhost:8080/api/link
@@ -181,47 +181,50 @@ $ curl -v -d "url=http://www.unizar.es/&qr=true" http://localhost:8080/api/link
 * Connection #0 to host localhost left intact
 {"url":"http://localhost:8080/tiny-6bb9db44","qr":"http://localhost:8080/qr/6bb9db44","properties":{"safe":true}}
 ```
-If you click on the qr URI address, you can see the QR code.
+If only the parameter qr = true appears and it doesn't appear format parameters, then the generated QR code will have the default format (height=500, width=500, color=black, background=white, typeImage=PNG, errorCorrectionLevel=L).
 
-### GET /qr/{hash}[.{format}]
+If you click on the qr URI address, you can see the QR code. 
+In this case, the QR code generated has the default format and is the following one:
+![alt text](QRCode6bb9db44.png)
 
-* GET /qr/{hash}[.{format}] returns an image with the correct content type; it must correspond to the URI obtained in the previous method. If the hash does not exist in the database or cannot be done a redirect with that hash for whatever reason (for example, not validated), the appropriate 400 type error will be returned.
-
-#### Example with format parameter:
+#### Example with qr parameter and with format parameters:
 
 ```shell
-curl -v http://localhost:8080/qr/6bb9db44?color=0xFFFF6666\&background=0xFFFFCCCC --output QRCode6bb9db44WithFormat.png
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 127.0.0.1...
+curl -v -d "url=http://www.unizar.es/&qr=true&qrColor=0xFFFF6666&qrBackground=0xFFFFCCCC" http://localhost:8080/api/link
+*   Trying 127.0.0.1...
 * TCP_NODELAY set
 * Connected to localhost (127.0.0.1) port 8080 (#0)
-> GET /qr/6bb9db44?color=0xFFFF6666&background=0xFFFFCCCC HTTP/1.1 
+> POST /api/link HTTP/1.1
 > Host: localhost:8080
 > User-Agent: curl/7.58.0
 > Accept: */*
+> Content-Length: 52
+> Content-Type: application/x-www-form-urlencoded
 >
-< HTTP/1.1 200
-< Content-Type: image/png
-< Content-Length: 13686
-< Date: Tue, 07 Dec 2021 15:05:48 GMT
+* upload completely sent off: 52 out of 52 bytes
+< HTTP/1.1 201
+< Location: http://localhost:8080/tiny-6bb9db44
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Tue, 14 Dec 2021 00:07:14 GMT
 <
-{ [13686 bytes data]
-100 13686  100 13686    0     0   107k      0 --:--:-- --:--:-- --:--:--  108k
 * Connection #0 to host localhost left intact
+{"url":"http://localhost:8080/tiny-6bb9db44","qr":"http://localhost:8080/qr/6bb9db44","properties":{"safe":true}}
 ```
+If the parameter qr = true appears and also any parameter relative to the qr code format appears, then the code will be generated with the format specified on that parameters.
 
-The output of the GET request has been output to the file QRCode6bb9db44WithFormat.png
-
-If you open this file, you can see the QR code.
-
+If you click on the qr URI address, you can see the QR code.
+In this case, using that parameters, the QR code has a specified format and is the following one:
 ![alt text](QRCode6bb9db44WithFormat.png)
 
-#### Example without format parameter:
+### GET /qr/{hash}
+
+* GET /qr/{hash} returns an image with the correct content type; it must correspond to the URI obtained in the previous method. If the hash does not exist in the database or cannot be done a redirect with that hash for whatever reason (for example, not validated), the appropriate 400 type error will be returned.
 
 ```shell
 $ curl -v http://localhost:8080/qr/6bb9db44 --output QRCode6bb9db44.png
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+  % Total    % Received % Xferd  Average Speed   Time    Time 
+    Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 127.0.0.1...
 * TCP_NODELAY set
@@ -231,29 +234,35 @@ $ curl -v http://localhost:8080/qr/6bb9db44 --output QRCode6bb9db44.png
 > User-Agent: curl/7.58.0
 > Accept: */*
 >
-< HTTP/1.1 200
+< HTTP/1.1 200 
 < Content-Type: image/png
-< Content-Length: 767
-< Date: Tue, 09 Nov 2021 18:01:39 GMT
+< Content-Length: 11722
+< Date: Tue, 14 Dec 2021 00:17:31 GMT
 <
-{ [767 bytes data]
-100   767  100   767    0     0  17044      0 --:--:-- --:--:-- --:--:-- 17044
+{ [11722 bytes data]
+100 11722  100 11722    0     0   121k      0 --:--:-- --:--:-- --:--:--  124k
 * Connection #0 to host localhost left intact
 ```
-The output of the GET request has been output to the file QRCode6bb9db44.png
+If the previous POST request has already been processed at the moment of the GET request, then the QR code will have the format which has been specified on that previous POST request. Otherwise, the QR code will be generated at the moment of the GET request and will have the default format (height=500, width=500, color=black, background=white, typeImage=PNG, errorCorrectionLevel=L).
 
+The output of the GET request has been output to the file QRCode6bb9db44.png.
 If you open this file, you can see the QR code.
 
-![alt text](QRCode6bb9db44.png)
-
 ### FALTA DE HACER
+* Cambiar tipo de dato de rabbit por el de QRCode y quitar QRCode2.
+* Añadir validatorService al hacer la peticion de post
+* Añadir ESTADO en el mensaje guardado en bd para poder coger el formato cuando no se ha consumido el mensaje por rabbit y autogenerarlo con dicho formato.
+* Hacer tests para todos los casos:
+  * Comprobando que genera el codigo qr por defecto cuando no ha sido generado aun por rabbit y quitar wait.
+  * Comprobar peticion POST sin parametro qr
+  * Comprobar peticion POST con qr = true, GET debe devolver un qr con el formato por defecto
+  * Comprobar peticion POST con qr = true y un formato especifico, GET debe devolver un qr con dicho formato
+  * Comprobar: Si alguna de las dos peticiones anteriores devuelve errores de tipo 400 por más de un motivo deberá devolver un objeto JSON especificando el motivo concreto del error el usuario. 
 
-* Hacer: Si alguna de las dos peticiones anteriores devuelve errores de tipo 400 por más de un motivo deberá devolver un objeto JSON especificando el motivo concreto del error el usuario. 
-
-  Ejemplo:
-  {
-   “error”: “URI de destino no validada todavía”
-  }
+    Ejemplo:
+    {
+     “error”: “URI de destino no validada todavía”
+    }
 
 ## Repositories
 
