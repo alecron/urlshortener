@@ -20,6 +20,7 @@ interface LogClickUseCase {
 class LogClickUseCaseImpl(
     private val clickRepository: ClickRepositoryService
 ) : LogClickUseCase {
+    @Async("taskExecutorUriInformation")
     override fun logClick(key: String, data: ClickProperties) {
         val cl = Click(
             hash = key,

@@ -28,6 +28,17 @@ class ApplicationConfiguration(
     @Autowired val shortUrlEntityRepository: ShortUrlEntityRepository,
     @Autowired val clickEntityRepository: ClickEntityRepository
 ) {
+
+    @Bean(name = ["taskExecutorUriInformation"])
+    fun ExecutorTask(): Executor? {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = 4;
+        executor.maxPoolSize = 10;
+        executor.setQueueCapacity(150);
+        executor.initialize()
+        return executor
+    }
+
     @Bean
     fun clickRepositoryService() = ClickRepositoryServiceImpl(clickEntityRepository)
 
