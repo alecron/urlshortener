@@ -6,9 +6,7 @@ import es.unizar.urlshortener.core.QRCodeRepositoryService
 import es.unizar.urlshortener.core.QRService
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.stereotype.Component
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
+import java.lang.Thread.sleep
 
 @Component
 class RabbitConsumerQR(
@@ -19,10 +17,7 @@ class RabbitConsumerQR(
     fun consumeMessageFromQueue(qrCode: QRCode2) {
         println("Message recieved from queue : ${qrCode.hash}")
         val qr = qrService.generateQR("http://localhost:8080/tiny-${qrCode.hash}", qrCode.format)
-        //Añadir directorio
-        val path: Path = Paths.get(System.getProperty("user.dir") + "/qrGenerated/tiny-${qrCode.hash}.png")
-        println("QR code generated at "+path)
-        Files.write(path, qr)
+        //sleep(60000) //1minuto -> Prueba para ver si genera el codigo QR en el momento cuando no está
         //Añadir en db
         qrCodeRepository.save(QRCode(qrCode.hash, qrCode.format, qr))
         println("QR code saved at repository: ${qrCode.hash}")

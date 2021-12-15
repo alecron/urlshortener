@@ -97,6 +97,7 @@ class QRServiceImpl : QRService {
         try {
             val color = format.color.substring(2).toLong(16).toInt()
             val background = format.background.substring(2).toLong(16).toInt()
+            println("${format.color} ${format.background}")
             val qrCodeWriter = QRCodeWriter()
             qrImage = MatrixToImageWriter.toBufferedImage(
                     qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, format.width, format.height, hints),
@@ -115,3 +116,22 @@ class QRServiceImpl : QRService {
         }
     }
 }
+
+/* Implementation of the port [URIReachableService].
+ */
+/*class URIReachableServiceImpl : URIReachableService {
+    private val client = HttpClient(CIO) {
+        install(HttpTimeout) {
+            requestTimeoutMillis = CONNECTION_TIMEOUT
+        }
+    }
+    override fun isReachable(url: String): Boolean {
+        val response: HttpResponse?
+        runBlocking {
+            response = try { client.get(url) }
+            catch (e: Exception) { null }
+        }
+        return response?.status == HttpStatusCode.OK
+    }
+}*/
+

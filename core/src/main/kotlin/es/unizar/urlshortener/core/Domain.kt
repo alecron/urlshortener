@@ -22,7 +22,9 @@ data class ShortUrl(
     val properties: ShortUrlProperties = ShortUrlProperties()
 )
 
-
+/**
+ * A [QRCode] is the mapping between a qr code identified by [qrCode] and a local short url identified by [hash].
+ */
 data class QRCode(
         val hash: String,
         val format: Format = Format(),

@@ -4,36 +4,77 @@ $(document).ready(
             function(event) {
                 event.preventDefault();
                 var withQR = $("#qr").is(":checked")
-                $.ajax({
-                    type : "POST",
-                    url : "/api/link",
-                    data : {
-                        url: $("#url").val(),
-                        qr: withQR
-                    } ,
-                    success : function(data) {
-                        $("#result").html(
-                            "<div class='alert alert-success lead'><a target='_blank' href='"
-                            + data.url
-                            + "'>"
-                            + data.url
-                            + "</a></div>");
-
-                        if (data.qr != null){
-                            $("#result").prepend(
+                var withFormat = $("#specifyFormat").is(":checked")
+                if (withFormat){
+                    $.ajax({
+                        type : "POST",
+                        url : "/api/link",
+                        data : {
+                            url: $("#url").val(),
+                            qr: withQR,
+                            qrHeight: $("#qrHeight").val(),
+                            qrWidth: $("#qrWidth").val(),
+                            qrColor: "0xff"+$("#qrColor").val().substring(1),
+                            qrBackground: "0xff"+$("#qrBackground").val().substring(1),
+                            qrTypeImage: $("#qrTypeImage").val(),
+                            qrErrorCorrectionLevel: $("#qrErrorCorrectionLevel").val(),
+                        } ,
+                        success : function(data) {
+                            $("#result").html(
                                 "<div class='alert alert-success lead'><a target='_blank' href='"
-                                + data.qr
+                                + data.url
                                 + "'>"
-                                + data.qr
+                                + data.url
                                 + "</a></div>");
+
+                            if (data.qr != null){
+                                $("#result").prepend(
+                                    "<div class='alert alert-success lead'><a target='_blank' href='"
+                                    + data.qr
+                                    + "'>"
+                                    + data.qr
+                                    + "</a></div>");
+                            }
+                        },
+                        error : function(xhr) {
+                            let err = JSON.parse(xhr.responseText)
+                            $("#result").html(
+                                "<div class='alert alert-danger lead'>" + err.message + "</div>");
                         }
-                    },
-                    error : function(xhr) {
-                        let err = JSON.parse(xhr.responseText)
-                        $("#result").html(
-                            "<div class='alert alert-danger lead'>" + err.message + "</div>");
-                    }
-                });
+                    });
+                } 
+                else{
+                    $.ajax({
+                        type : "POST",
+                        url : "/api/link",
+                        data : {
+                            url: $("#url").val(),
+                            qr: withQR
+                        } ,
+                        success : function(data) {
+                            $("#result").html(
+                                "<div class='alert alert-success lead'><a target='_blank' href='"
+                                + data.url
+                                + "'>"
+                                + data.url
+                                + "</a></div>");
+
+                            if (data.qr != null){
+                                $("#result").prepend(
+                                    "<div class='alert alert-success lead'><a target='_blank' href='"
+                                    + data.qr
+                                    + "'>"
+                                    + data.qr
+                                    + "</a></div>");
+                            }
+                        },
+                        error : function(xhr) {
+                            let err = JSON.parse(xhr.responseText)
+                            $("#result").html(
+                                "<div class='alert alert-danger lead'>" + err.message + "</div>");
+                        }
+                    });
+                }
             });
 
         $("#csvShortener").submit(

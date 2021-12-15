@@ -8,7 +8,7 @@ import es.unizar.urlshortener.core.*
  * **Note**: This is an example of functionality.
  */
 interface QRUrlUseCase {
-    fun generateQR(id: String, format: Format): ByteArray
+    fun generateQR(id: String): ByteArray
 }
 
 /**
@@ -16,17 +16,23 @@ interface QRUrlUseCase {
  */
 class QRUrlUseCaseImpl(
         private val shortUrlRepository: ShortUrlRepositoryService,
+        private val validatorService: ValidatorService,
+        private val qrService: QRService,
         private val qrCodeRepository: QRCodeRepositoryService
 ) : QRUrlUseCase {
-    override fun generateQR(id: String, format: Format): ByteArray {
+    override fun generateQR(id: String): ByteArray {
         //Check id/hash
-        shortUrlRepository.findByKey(id)?.redirection
+        val su : ShortUrl? = shortUrlRepository.findByKey(id)
+        val redirection : Redirection = su?.redirection
                 ?: throw RedirectionNotFound(id)
-        // No hace falta comprobar que sea Alcanzable
-        // al hacer la redirección ya comprueba si es
-        // alcanzable o no
+        //Check url is reachable
+        if (!su.properties.reachable) {
+            throw UrlNotReachable(redirection.target)
+        }
+        //if the hash exists in the db, the program returns the qr code stored in the db
+        //in other case, the program generates the qr code with the default format
         return qrCodeRepository.findByKey(id)?.qrCode
-                ?: throw RedirectionNotFound(id)
+                ?: qrService.generateQR("http://localhost:8080/tiny-$id", Format())
     }
 
 }

@@ -18,6 +18,9 @@ interface ShortUrlRepositoryService {
     fun save(su: ShortUrl): ShortUrl
 }
 
+/**
+ * [QRCodeRepositoryService] is the port to the repository that provides management to [QRCode][QRCode].
+ */
 interface QRCodeRepositoryService {
     fun findByKey(id: String): QRCode?
     fun save(qrCode: QRCode): QRCode
