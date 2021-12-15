@@ -35,7 +35,7 @@ class ApplicationConfiguration(
 
 
     @Bean(name = ["taskExecutorUriInformation"])
-    fun ExecutorTask(): Executor? {
+    fun executorTask(): Executor? {
         val executor = ThreadPoolTaskExecutor()
         executor.corePoolSize = 4
         executor.maxPoolSize = 10
@@ -81,8 +81,7 @@ class ApplicationConfiguration(
 
     @Bean
     fun qrUrlUseCase() = QRUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), qrService(), qrCodeRepositoryService())
-  
-    
+
     @Bean 
     fun infoShortUrlUseCase() = InfoShortUrlUseCaseImpl(shortUrlRepositoryService(), clickRepositoryService())
 

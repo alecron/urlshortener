@@ -202,13 +202,15 @@ class UrlShortenerControllerImpl(
     }
 
     fun getClientBrowser(request: HttpServletRequest): String? {
-        val browserDetails: String = request.getHeader("User-Agent")
-        val user: String = browserDetails.toLowerCase()
-        var browser = ""
+        val browserDetails = request.getHeader("User-Agent")
+        val user = if(browserDetails.isNullOrBlank()) null else browserDetails.toLowerCase()
+        var browser:String? = null
 
-        println(browserDetails)
+        //println(browserDetails)
 
-        if (user.contains("msie")) {
+        if(user.isNullOrBlank()){
+            browser = null
+        }else if (user.contains("msie")) {
             val substring: String = browserDetails.substring(browserDetails.indexOf("MSIE")).split(";").get(0)
             browser = substring.split(" ").get(0).replace("MSIE", "IE") + "-" + substring.split(" ").get(1)
         } else if (user.contains("safari") && user.contains("version")) {
@@ -252,10 +254,12 @@ class UrlShortenerControllerImpl(
     }
 
     fun getClientPlatform(request: HttpServletRequest): String? {
-        val browserDetails: String = request.getHeader("User-Agent")
+        val browserDetails = request.getHeader("User-Agent")
 
-        val lowerCaseBrowser: String = browserDetails.toLowerCase()
-        return if (lowerCaseBrowser.contains("windows")) {
+        val lowerCaseBrowser = if(browserDetails.isNullOrBlank()) null else browserDetails.toLowerCase()
+        return if(lowerCaseBrowser.isNullOrBlank()){
+            null
+        }else if (lowerCaseBrowser.contains("windows")) {
             "Windows"
         } else if (lowerCaseBrowser.contains("mac")) {
             "Mac"

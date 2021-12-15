@@ -7,6 +7,9 @@ interface InfoShortUrlUseCase{
     fun info(id: String): String
 }
 
+/**
+ * Implementation of [InfoShortUrlUseCase].
+ */
 class InfoShortUrlUseCaseImpl(
     private val shortUrlRepository: ShortUrlRepositoryService, 
     private val clickRepository: ClickRepositoryService
