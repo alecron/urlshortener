@@ -1,6 +1,7 @@
 package es.unizar.urlshortener.core
 
-import java.awt.image.BufferedImage
+
+import java.util.concurrent.CompletableFuture
 
 /**
  * [ClickRepositoryService] is the port to the repository that provides persistence to [Clicks][Click].
@@ -19,12 +20,21 @@ interface ShortUrlRepositoryService {
 }
 
 /**
+ * [QRCodeRepositoryService] is the port to the repository that provides management to [QRCode][QRCode].
+ */
+interface QRCodeRepositoryService {
+    fun findByKey(id: String): QRCode?
+    fun save(qrCode: QRCode): QRCode
+}
+
+/**
  * [ValidatorService] is the port to the service that validates if an url can be shortened.
  *
  * **Note**: It is a design decision to create this port. It could be part of the core .
  */
 interface ValidatorService {
     fun isValid(url: String): Boolean
+    fun isReachable(url : String) : CompletableFuture<Boolean>
 }
 
 /**
@@ -45,11 +55,5 @@ interface QRService{
     fun generateQR(url: String, format: Format): ByteArray
 }
 
-/**
- * [URIReachable] is the port to the service that verifies that a URI can be reached.
- *
- * **Note**: It is a design decision to create this port. It could be part of the core .
- */
-interface URIReachableService {
-    fun isReachable(url: String): Boolean
-}
+
+

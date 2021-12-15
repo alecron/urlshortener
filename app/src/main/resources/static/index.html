@@ -3,36 +3,134 @@
 <head>
     <title>URL Shortener</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css"
-          href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script type="text/javascript" src="webjars/jquery/2.1.4/jquery.min.js"></script>
-    <script type="text/javascript"
-            src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous">
+    </script>
     <script type="text/javascript" src="js/app.js">
     </script>
 </head>
 <body>
 <div class="container-full">
-    <div class="row">
-        <div class="col-lg-12 text-center">
+    <div class="row d-flex justify-content-center">
+        <div class="col-lg-6 text-center">
             <h1>URL Shortener</h1>
-            <p class="lead">A front-end example page for the project</p>
             <br>
-            <form class="col-lg-12" role="form" id="shortener" action="">
-                <div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
-                    <input type="text" class="center-block form-control input-lg"
-                           title="Enter a URL" placeholder="Enter a URL" name="url">
-                    <span class="input-group-btn"><button
-                            class="btn btn-lg btn-primary" type="submit">Short me!</button></span>
+            <nav>
+                <div class="nav nav-pills mb-3 d-flex justify-content-center" id="pills-tab" role="tablist">
+                    <button class="nav-link active" id="nav-url-tab" data-bs-toggle="tab" data-bs-target="#nav-url" type="button" role="tab" aria-controls="nav-url" aria-selected="true">URL</button>
+                    <button class="nav-link" id="nav-csv-tab" data-bs-toggle="tab" data-bs-target="#nav-csv" type="button" role="tab" aria-controls="nav-csv" aria-selected="false">CSV</button>
                 </div>
-            </form>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-url" role="tabpanel" aria-labelledby="nav-url-tab">
+                    <form class="col-lg-12" role="form" id="shortener" method="POST">
+                        <div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+                            <input type="text" class="center-block form-control input-lg"
+                                   title="Enter a URL" placeholder="Enter a URL" id="url" name="url">
+                            <span class="input-group-btn"><button
+                                    class="btn btn-lg btn-primary" id="shortBtn" type="submit">Short me!</button></span>
+                        </div>
+                        <div class="form-check d-flex justify-content-center mt-2">
+                            <input class="form-check-input" type="checkbox" id="qr" name="qr">
+                            <script type="text/javascript">
+                                function qr_onclick() {
+                                    var withQR = $("#qr").is(":checked")
+                                    if (withQR){
+                                        document.getElementById("specifyQRFormat").style.visibility = 'visible';
+                                    } 
+                                    else{
+                                        document.getElementById("specifyQRFormat").style.visibility = 'hidden';
+                                    }
+                                }
+                                document.getElementById("qr").onclick = qr_onclick
+                           </script>
+                            <label class="form-check-label" for="qr">
+                                Generate QR
+                            </label>
+                        </div>
+                        <div class="form-check d-flex justify-content-center mt-2" id="specifyQRFormat" style= "visibility:hidden">
+                            <input class="form-check-input" type="checkbox" id="specifyFormat" name="specifyFormat">
+                            <script type="text/javascript">
+                                function specifyFormat_onclick() {
+                                    var withFormat = $("#specifyFormat").is(":checked")
+                                    if (withFormat){
+                                        document.getElementById("qrFormat").style.visibility = 'visible';
+                                    } 
+                                    else{
+                                        document.getElementById("qrFormat").style.visibility = 'hidden';
+                                    }
+                                }
+                                document.getElementById("specifyFormat").onclick = specifyFormat_onclick
+                           </script>
+                            <label class="form-check-label" for="qr">
+                                Do you want to specify a qr format?
+                            </label>
+                        </div>
+                        <div id="qrFormat" style= "visibility:hidden">
+                            <div>
+                                <label for="qrHeight">Height (1-1000):</label>
+                                <input type="number" id="qrHeight" name="qrHeight" value="500" min="1" max="1000">
+                            </div>
+                            <div>
+                                <label for="qrWidth">Width (1-1000):</label>
+                                <input type="number" id="qrWidth" name="qrWidth" value="500" min="1" max="1000">
+                            </div>
+                            <div>
+                                <label for="qrColor">Color:</label>
+                                <input type="color" id="qrColor" name="qrColor" value=#000000>
+                            </div>
+                            <div>
+                                <label for="qrBackground">Background:</label>
+                                <input type="color" id="qrBackground" name="qrBackground" value=#FFFFFF>
+                            </div>
+                            <div>
+                                <label for="qrTypeImage">Type Image:</label>
+                                <select id="qrTypeImage" name="qrTypeImage">
+                                    <option value="PNG" selected>PNG</option>
+                                    <option value="JPEG">JPEG</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="qrErrorCorrectionLevel">Error correction level:</label>
+                                <select id="qrErrorCorrectionLevel" name="qrErrorCorrectionLevel">
+                                    <option value="L" selected>L = ~7% correction</option>
+                                    <option value="M">M = ~15% correction</option>
+                                    <option value="Q">Q = ~25% correction</option>
+                                    <option value="H">H = ~30% correction</option>
+                                </select>
+                            </div>
+                            
+                        </div>
+                    </form>
+
+                </div>
+                <div class="tab-pane fade" id="nav-csv" role="tabpanel" aria-labelledby="nav-csv-tab">
+                    <form class="col-lg-12" enctype="multipart/form-data" role="form" action="" id="csvShortener">
+                        <label for="file" class="form-label">Upload your CSV file</label>
+                        <div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+                            <input class="form-control center-block " type="file" id="file" name="file">
+                            <span class="input-group-btn"><button
+                                    class="btn btn-lg btn-primary" type="submit">Upload</button></span>
+                        </div>
+                        <div class="form-check d-flex justify-content-center mt-2">
+                            <!-- Al pasar qrCSV como parámetro cambiar el nombre a qr-->
+                            <input class="form-check-input " type="checkbox" id="qrCSV" name="qrCSV">
+                            <label class="form-check-label" for="qrCSV">
+                                Generate QR
+                            </label>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-12 text-center">
+    <div class="row d-flex">
+        <div class="col-lg-12 text-center d-flex justify-content-center">
             <div class="col-sm-offset-4 col-sm-4 text-center">
                 <br />
-                <div id="result" />
+                <div id="result" ></div>
             </div>
         </div>
     </div>

@@ -44,6 +44,7 @@ fun ShortUrlEntity.toDomain() = ShortUrl(
         sponsor = sponsor,
         owner = owner,
         safe = safe,
+        reachable = reachable,
         ip = ip,
         country = country
     )
@@ -60,7 +61,37 @@ fun ShortUrl.toEntity() = ShortUrlEntity(
     owner = properties.owner,
     sponsor = properties.sponsor,
     safe = properties.safe,
+    reachable = properties.reachable,
     ip = properties.ip,
     country = properties.country
 )
 
+/**
+ * Extension method to convert a [QRCodeEntity] into a domain [QRCode].
+ */
+fun QRCodeEntity.toDomain() = QRCode(
+        hash = hash,
+        format = Format(
+                height = height,
+                width = width,
+                color = color,
+                background = background,
+                typeImage = typeImage,
+                errorCorrectionLevel = errorCorrectionLevel
+        ),
+        qrCode = qrCode
+)
+
+/**
+ * Extension method to convert a domain [QRCode] into a [QRCodeEntity].
+ */
+fun QRCode.toEntity() = QRCodeEntity(
+        hash = hash,
+        height = format.height,
+        width = format.width,
+        color = format.color,
+        background = format.background,
+        typeImage = format.typeImage,
+        errorCorrectionLevel = format.errorCorrectionLevel,
+        qrCode = qrCode
+)

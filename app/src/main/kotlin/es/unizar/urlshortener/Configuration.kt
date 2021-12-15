@@ -8,16 +8,14 @@ import es.unizar.urlshortener.core.usecases.InfoShortUrlUseCaseImpl
 import es.unizar.urlshortener.infrastructure.delivery.QRServiceImpl
 import es.unizar.urlshortener.core.usecases.*
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
-import es.unizar.urlshortener.infrastructure.delivery.URIReachableServiceImpl
+import es.unizar.urlshortener.infrastructure.delivery.QRServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
-import es.unizar.urlshortener.infrastructure.repositories.ClickEntityRepository
-import es.unizar.urlshortener.infrastructure.repositories.ClickRepositoryServiceImpl
-import es.unizar.urlshortener.infrastructure.repositories.ShortUrlEntityRepository
-import es.unizar.urlshortener.infrastructure.repositories.ShortUrlRepositoryServiceImpl
+import es.unizar.urlshortener.infrastructure.repositories.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import java.util.concurrent.Executor
 
 /**
@@ -25,11 +23,17 @@ import java.util.concurrent.Executor
  *
  * **Note**: Spring Boot is able to discover this [Configuration] without further configuration.
  */
+
+/* Information about asyncExecutor : https://howtodoinjava.com/spring-boot2/rest/enableasync-async-controller/
+* */
+@EnableAsync(proxyTargetClass = true)
 @Configuration
 class ApplicationConfiguration(
     @Autowired val shortUrlEntityRepository: ShortUrlEntityRepository,
-    @Autowired val clickEntityRepository: ClickEntityRepository
+    @Autowired val clickEntityRepository: ClickEntityRepository,
+    @Autowired val qrCodeEntityRepository: QRCodeEntityRepository
 ) {
+
 
     @Bean(name = ["taskExecutorUriInformation"])
     fun ExecutorTask(): Executor? {
@@ -41,6 +45,17 @@ class ApplicationConfiguration(
         return executor
     }
 
+    @Bean(name = ["taskExecutorReachable"])
+    fun taskExecutor(): Executor? {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = 4
+        executor.maxPoolSize = 10
+        executor.setQueueCapacity(150)
+        executor.initialize()
+        return executor
+    }
+
+    
     @Bean
     fun clickRepositoryService() = ClickRepositoryServiceImpl(clickEntityRepository)
 
@@ -48,10 +63,10 @@ class ApplicationConfiguration(
     fun shortUrlRepositoryService() = ShortUrlRepositoryServiceImpl(shortUrlEntityRepository)
 
     @Bean
-    fun validatorService() = ValidatorServiceImpl()
+    fun qrCodeRepositoryService() = QRCodeRepositoryServiceImpl(qrCodeEntityRepository)
 
     @Bean
-    fun uRIReachableService() = URIReachableServiceImpl()
+    fun validatorService() = ValidatorServiceImpl()
 
     @Bean
     fun hashService() = HashServiceImpl()
@@ -60,17 +75,21 @@ class ApplicationConfiguration(
     fun qrService() = QRServiceImpl()
 
     @Bean
-    fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService(),uRIReachableService())
+    fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService())
 
     @Bean
     fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
 
     @Bean
-    fun qrUrlUseCase() = QRUrlUseCaseImpl(shortUrlRepositoryService(), qrService())
+    fun qrUrlUseCase() = QRUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), qrService(), qrCodeRepositoryService())
   
-    @Bean
-    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), uRIReachableService())
-
+    
     @Bean 
     fun infoShortUrlUseCase() = InfoShortUrlUseCaseImpl(shortUrlRepositoryService(), clickRepositoryService())
+
+    @Bean
+    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService())
+
+    @Bean
+    fun createCsvUseCase() = CreateCsvUseCaseImpl(createShortUrlUseCase(), validatorService())
 }
