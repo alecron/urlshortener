@@ -3,6 +3,7 @@ package es.unizar.urlshortener.core.usecases
 import es.unizar.urlshortener.core.Click
 import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.ClickRepositoryService
+import org.springframework.scheduling.annotation.Async
 import java.util.Date
 
 /**
@@ -17,7 +18,7 @@ interface LogClickUseCase {
 /**
  * Implementation of [LogClickUseCase].
  */
-class LogClickUseCaseImpl(
+open class LogClickUseCaseImpl(
     private val clickRepository: ClickRepositoryService
 ) : LogClickUseCase {
     @Async("taskExecutorUriInformation")

@@ -17,6 +17,8 @@ import es.unizar.urlshortener.infrastructure.repositories.ShortUrlRepositoryServ
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import java.util.concurrent.Executor
 
 /**
  * Wires use cases with service implementations, and services implementations with repositories.
@@ -32,9 +34,9 @@ class ApplicationConfiguration(
     @Bean(name = ["taskExecutorUriInformation"])
     fun ExecutorTask(): Executor? {
         val executor = ThreadPoolTaskExecutor()
-        executor.corePoolSize = 4;
-        executor.maxPoolSize = 10;
-        executor.setQueueCapacity(150);
+        executor.corePoolSize = 4
+        executor.maxPoolSize = 10
+        executor.setQueueCapacity(150)
         executor.initialize()
         return executor
     }
