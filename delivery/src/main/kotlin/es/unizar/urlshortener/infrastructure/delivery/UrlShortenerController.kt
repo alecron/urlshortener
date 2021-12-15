@@ -193,7 +193,9 @@ class UrlShortenerControllerImpl(
                     val urlHash = it.shortUrl.hash
                     val uriRecord = linkTo<UrlShortenerControllerImpl> { redirectTo(urlHash, request) }.toString()
                     var qrRecord = ""
+
                     if(qr) qrRecord = linkTo<QRControllerImpl> { redirectTo(urlHash, request) }.toString()
+
                     if(firstURL == null){
                         // Se guarda la primera URI acortada
                         firstURL = linkTo<UrlShortenerControllerImpl> { redirectTo(urlHash, request) }.toUri()

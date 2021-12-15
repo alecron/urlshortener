@@ -134,3 +134,4 @@ class QRServiceImpl : QRService {
         return response?.status == HttpStatusCode.OK
     }
 }*/
+
