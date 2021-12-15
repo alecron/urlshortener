@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest
 class CsvPubController(
         val template: RabbitTemplate
 ) {
+    val QUEUE = "csvqueue"
     val EXCHANGE = "csvexchange"
     val ROUTING_KEY = "csvqueue_routingKey"
 

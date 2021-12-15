@@ -7,3 +7,8 @@ spring:
     driverClassName: org.hsqldb.jdbc.JDBCDriver
   jpa:
     open-in-view: false
+  rabbitmq:
+    host: rat.rmq2.cloudamqp.com
+    username: dvzlqbfo
+    password: 1liSXYAv2FA7yqFIN4bL4ni5WwGPhMnC
+    virtual-host: dvzlqbfo
