@@ -268,6 +268,7 @@ class UrlShortenerControllerImpl(
         } else {
             "UnKnown, More-Info: $browserDetails"
         }
+    }
 
     private fun generarCsv(csvParser: CSVParser, csvPrinter: CSVPrinter, request: HttpServletRequest, qr: Boolean): URI? {
         var firstURL: URI? = null
