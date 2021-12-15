@@ -4,6 +4,7 @@ import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.Format
 import es.unizar.urlshortener.core.ShortUrlProperties
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import es.unizar.urlshortener.core.*
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
@@ -51,6 +52,13 @@ interface UrlShortenerController {
      */
     fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
 
+    /**
+     * Gets info about short url identified by its [id]
+     *
+     * **Note**: Delivery of use case [InfoShortUrlUseCase]
+     */
+    fun getInfo(id: String, request: HttpServletRequest): ResponseEntity<String>
+
 
     fun csvProcessor(file : MultipartFile, qr : Boolean, request: HttpServletRequest) : ResponseEntity<Resource>
 }
@@ -90,6 +98,7 @@ class UrlShortenerControllerImpl(
     val redirectUseCase: RedirectUseCase,
     val logClickUseCase: LogClickUseCase,
     val createShortUrlUseCase: CreateShortUrlUseCase,
+    val infoShortUrlUseCase: InfoShortUrlUseCase,
     val createCsvUseCase: CreateCsvUseCase,
     private val validatorService: ValidatorService
 ) : UrlShortenerController {
@@ -99,12 +108,24 @@ class UrlShortenerControllerImpl(
 
     @GetMapping("/tiny-{id:.*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void> =
-        redirectUseCase.redirectTo(id).let {
-            logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
+         redirectUseCase.redirectTo(id).let {
+            val browser = getClientBrowser(request)
+            val platform = getClientPlatform(request)
+            logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr, platform = platform, browser = browser))
             val h = HttpHeaders()
             h.location = URI.create(it.target)
             ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
         }
+
+
+    @GetMapping("/{id:.*}-json")
+    override fun getInfo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<String> =
+        redirectUseCase.redirectTo(id).let {
+            val h = HttpHeaders()
+            val response = infoShortUrlUseCase.info(id)
+            return ResponseEntity<String>(response, h, HttpStatus.OK)
+        }
+           
 
     @PostMapping("/api/link", consumes = [ MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> =
@@ -159,7 +180,6 @@ class UrlShortenerControllerImpl(
         if(file.isEmpty){
             throw EmptyFile(file.name)
         } else{
-
             val reader = BufferedReader(InputStreamReader(file.inputStream))
             val csvParser = CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(',') )
             val byteArrayOutputStream = ByteArrayOutputStream()
@@ -178,6 +198,79 @@ class UrlShortenerControllerImpl(
                     h,
                     HttpStatus.OK
             )
+        }
+    }
+
+    fun getClientBrowser(request: HttpServletRequest): String? {
+        val browserDetails = request.getHeader("User-Agent")
+        val user = if(browserDetails.isNullOrBlank()) null else browserDetails.toLowerCase()
+        var browser:String? = null
+
+        //println(browserDetails)
+
+        if(user.isNullOrBlank()){
+            browser = null
+        }else if (user.contains("msie")) {
+            val substring: String = browserDetails.substring(browserDetails.indexOf("MSIE")).split(";").get(0)
+            browser = substring.split(" ").get(0).replace("MSIE", "IE") + "-" + substring.split(" ").get(1)
+        } else if (user.contains("safari") && user.contains("version")) {
+            browser = browserDetails.substring(browserDetails.indexOf("Safari")).split(" ").get(0).split(
+                "/"
+            ).get(0) + "-" + browserDetails.substring(
+                browserDetails.indexOf("Version")
+            ).split(" ").get(0).split("/").get(1)
+        } else if (user.contains("opr") || user.contains("opera")) {
+            if (user.contains("opera")) browser =
+                browserDetails.substring(browserDetails.indexOf("Opera")).split(" ").get(0)
+                    .split(
+                        "/"
+                    ).get(0) + "-" + browserDetails.substring(
+                    browserDetails.indexOf("Version")
+                ).split(" ").get(0).split("/").get(1) else if (user.contains("opr")) browser =
+                browserDetails.substring(browserDetails.indexOf("OPR")).split(" ").get(0)
+                    .replace(
+                        "/",
+                        "-"
+                    ).replace(
+                        "OPR", "Opera"
+                    )
+        } else if (user.contains("chrome")) {
+            browser = browserDetails.substring(browserDetails.indexOf("Chrome")).split(" ").get(0).replace("/", "-")
+        } else if (user.indexOf("mozilla/7.0") > -1 || user.indexOf("netscape6") !== -1 || user.indexOf(
+                "mozilla/4.7"
+            ) !== -1 || user.indexOf("mozilla/4.78") !== -1 || user.indexOf(
+                "mozilla/4.08"
+            ) !== -1 || user.indexOf("mozilla/3") !== -1
+        ) {
+            browser = "Netscape-?"
+        } else if (user.contains("firefox")) {
+            browser = browserDetails.substring(browserDetails.indexOf("Firefox")).split(" ").get(0).replace("/", "-")
+        } else if (user.contains("rv")) {
+            browser = "IE"
+        } else {
+            browser = "UnKnown, More-Info: $browserDetails"
+        }
+        return browser
+    }
+
+    fun getClientPlatform(request: HttpServletRequest): String? {
+        val browserDetails = request.getHeader("User-Agent")
+
+        val lowerCaseBrowser = if(browserDetails.isNullOrBlank()) null else browserDetails.toLowerCase()
+        return if(lowerCaseBrowser.isNullOrBlank()){
+            null
+        }else if (lowerCaseBrowser.contains("windows")) {
+            "Windows"
+        } else if (lowerCaseBrowser.contains("mac")) {
+            "Mac"
+        } else if (lowerCaseBrowser.contains("x11")) {
+            "Unix"
+        } else if (lowerCaseBrowser.contains("android")) {
+            "Android"
+        } else if (lowerCaseBrowser.contains("iphone")) {
+            "IPhone"
+        } else {
+            "UnKnown, More-Info: $browserDetails"
         }
     }
 

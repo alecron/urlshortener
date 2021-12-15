@@ -40,6 +40,7 @@ project(":core") {
         "implementation"("io.ktor:ktor-client-core:1.6.5")
         "implementation" ("io.ktor:ktor-client-cio:1.6.5")
         "implementation" ("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.5")
+
         "implementation"("org.springframework.boot:spring-boot-starter")
     }
     tasks.getByName<BootJar>("bootJar") {

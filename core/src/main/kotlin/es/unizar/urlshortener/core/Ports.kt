@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture
  */
 interface ClickRepositoryService {
     fun save(cl: Click): Click
+    fun findAllByHash(hash: String): List<Click>
 }
 
 /**

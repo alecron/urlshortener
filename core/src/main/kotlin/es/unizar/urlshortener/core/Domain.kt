@@ -12,6 +12,12 @@ data class Click(
     val created: OffsetDateTime = OffsetDateTime.now()
 )
 
+data class SimpleClick(
+        val hash: String,
+        val browser: String? = null,
+        val platform: String? = null
+)
+
 /**
  * A [ShortUrl] is the mapping between a remote url identified by [redirection] and a local short url identified by [hash].
  */
