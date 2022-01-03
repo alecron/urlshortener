@@ -117,21 +117,4 @@ class QRServiceImpl : QRService {
     }
 }
 
-/* Implementation of the port [URIReachableService].
- */
-/*class URIReachableServiceImpl : URIReachableService {
-    private val client = HttpClient(CIO) {
-        install(HttpTimeout) {
-            requestTimeoutMillis = CONNECTION_TIMEOUT
-        }
-    }
-    override fun isReachable(url: String): Boolean {
-        val response: HttpResponse?
-        runBlocking {
-            response = try { client.get(url) }
-            catch (e: Exception) { null }
-        }
-        return response?.status == HttpStatusCode.OK
-    }
-}*/
 
