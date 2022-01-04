@@ -97,3 +97,20 @@ fun QRCode.toEntity() = QRCodeEntity(
         errorCorrectionLevel = format.errorCorrectionLevel,
         qrCode = qrCode
 )
+
+fun CsvUrl.toEntity() = CsvUrlEntity(
+    id = null,
+    uuid = uuid,
+    urlHash = urlHash,
+    originalUri = originalUri,
+    comment = comment,
+    qrRecord = qrRecord
+)
+
+fun CsvUrlEntity.toDomain() = CsvUrl(
+    uuid = uuid,
+    urlHash = urlHash,
+    originalUri = originalUri,
+    comment = comment,
+    qrRecord = qrRecord
+)

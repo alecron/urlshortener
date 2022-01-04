@@ -22,7 +22,7 @@ class CreateCsvUseCaseImpl (
         if(!validatorService.isValid(url)){
             // Se concatena la URL para mantener la estructura
             // del CSV
-            return url + ",,La URI no es valida "
+            return "La URI no es valida "
         } else {
             return ShortUrlCSV(
                     url,

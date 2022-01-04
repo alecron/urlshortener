@@ -19,6 +19,12 @@ interface ShortUrlRepositoryService {
     fun save(su: ShortUrl): ShortUrl
 }
 
+interface CsvUrlRepositoryService {
+    fun save(csvurl: CsvUrl): CsvUrl
+    fun findAllByuuid(uuid: String) : List<CsvUrl>
+    fun countByUuid(uuid: String) : Long
+}
+
 /**
  * [QRCodeRepositoryService] is the port to the repository that provides management to [QRCode][QRCode].
  */

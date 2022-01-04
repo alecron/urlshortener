@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "es.unizar"
-version = "0.0.1-SNAPSHOT"
+version = "1.0.0"
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
@@ -37,9 +37,10 @@ project(":core") {
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
     dependencies {
+        "implementation"("org.springframework.boot:spring-boot-starter-amqp")
         "implementation"("io.ktor:ktor-client-core:1.6.5")
         "implementation" ("io.ktor:ktor-client-cio:1.6.5")
-        "implementation" ("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.5")
+        "implementation" ("com.fasterxml.jackson.module:jackson-module-kotlin")
 
         "implementation"("org.springframework.boot:spring-boot-starter")
     }
@@ -72,6 +73,8 @@ project(":delivery") {
         "implementation"("com.fasterxml.jackson.module:jackson-module-kotlin")
         "implementation"("commons-validator:commons-validator:1.6")
         "implementation"("com.google.guava:guava:23.0")
+        "implementation"("org.webjars:webjars-locator:0.42")
+        "implementation"("org.webjars.npm:htmx.org:1.6.0")
         //QR generator
         "implementation"("com.google.zxing:core:3.3.3")
         "implementation"("com.google.zxing:javase:3.3.3")
@@ -101,11 +104,15 @@ project(":app") {
         "implementation"("org.springframework.boot:spring-boot-starter")
         "implementation"( "org.webjars:bootstrap:3.3.5")
         "implementation"("org.webjars:jquery:2.1.4")
+        "implementation"("org.springframework.boot:spring-boot-starter-amqp")
+        "implementation"("org.webjars.npm:htmx.org:1.6.0")
 
         "runtimeOnly"("org.hsqldb:hsqldb")
 
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
+        "implementation"("org.springframework.boot:spring-boot-starter-hateoas")
         "testImplementation"("org.springframework.boot:spring-boot-starter-web")
+        "implementation"("org.springframework.boot:spring-boot-starter-thymeleaf")
         "testImplementation"("org.springframework.boot:spring-boot-starter-jdbc")
         "testImplementation"("org.mockito.kotlin:mockito-kotlin:3.2.0")
         "testImplementation"("com.fasterxml.jackson.module:jackson-module-kotlin")

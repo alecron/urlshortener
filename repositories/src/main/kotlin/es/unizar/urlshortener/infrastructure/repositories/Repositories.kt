@@ -29,3 +29,8 @@ interface ClickEntityRepository : JpaRepository<ClickEntity, Long>{
     //Revisar sintaxis
     fun findAllByHash(hash: String) : List<ClickEntity>
 }
+
+interface CsvUrlEntityRepository : JpaRepository<CsvUrlEntity, Long> {
+    fun countByUuid(uuid : String) : Long
+    fun findAllByUuid(uuid : String) : List<CsvUrlEntity>
+}

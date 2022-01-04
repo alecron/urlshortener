@@ -27,6 +27,15 @@ class ShortUrlRepositoryServiceImpl(
     override fun save(su: ShortUrl): ShortUrl = shortUrlEntityRepository.save(su.toEntity()).toDomain()
 }
 
+class CsvUrlRepositoryServiceImpl(
+        private val csvUrlEntityRepository: CsvUrlEntityRepository
+) : CsvUrlRepositoryService {
+    override fun save(csvurl: CsvUrl): CsvUrl = csvUrlEntityRepository.save(csvurl.toEntity()).toDomain()
+
+    override fun findAllByuuid(uuid: String): List<CsvUrl> = csvUrlEntityRepository.findAllByUuid(uuid).map{ it.toDomain() }
+
+    override fun countByUuid(uuid: String): Long = csvUrlEntityRepository.countByUuid(uuid)
+}
 /**
  * Implementation of the port [QRCodeRepositoryService].
  */
@@ -37,4 +46,3 @@ class QRCodeRepositoryServiceImpl(
 
     override fun save(qrCode: QRCode): QRCode = qrCodeEntityRepository.save(qrCode.toEntity()).toDomain()
 }
-

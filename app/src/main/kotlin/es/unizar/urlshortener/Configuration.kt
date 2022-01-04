@@ -1,13 +1,8 @@
 package es.unizar.urlshortener
 
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCaseImpl
-import es.unizar.urlshortener.core.usecases.LogClickUseCaseImpl
-import es.unizar.urlshortener.core.usecases.RedirectUseCaseImpl
-import es.unizar.urlshortener.core.usecases.QRUrlUseCaseImpl
-import es.unizar.urlshortener.core.usecases.InfoShortUrlUseCaseImpl
-import es.unizar.urlshortener.infrastructure.delivery.QRServiceImpl
 import es.unizar.urlshortener.core.usecases.*
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
+import es.unizar.urlshortener.infrastructure.delivery.QRServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,6 +11,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.concurrent.Executor
+
 
 /**
  * Wires use cases with service implementations, and services implementations with repositories.
@@ -30,6 +26,7 @@ import java.util.concurrent.Executor
 class ApplicationConfiguration(
     @Autowired val shortUrlEntityRepository: ShortUrlEntityRepository,
     @Autowired val clickEntityRepository: ClickEntityRepository,
+    @Autowired val csvUrlEntityRepository: CsvUrlEntityRepository,
     @Autowired val qrCodeEntityRepository: QRCodeEntityRepository
 ) {
 
@@ -54,12 +51,15 @@ class ApplicationConfiguration(
         return executor
     }
 
-    
+
     @Bean
     fun clickRepositoryService() = ClickRepositoryServiceImpl(clickEntityRepository)
 
     @Bean
     fun shortUrlRepositoryService() = ShortUrlRepositoryServiceImpl(shortUrlEntityRepository)
+
+    @Bean
+    fun csvUrlRepositoryService() = CsvUrlRepositoryServiceImpl(csvUrlEntityRepository)
 
     @Bean
     fun qrCodeRepositoryService() = QRCodeRepositoryServiceImpl(qrCodeEntityRepository)
@@ -82,7 +82,7 @@ class ApplicationConfiguration(
     @Bean
     fun qrUrlUseCase() = QRUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), qrService(), qrCodeRepositoryService())
 
-    @Bean 
+    @Bean
     fun infoShortUrlUseCase() = InfoShortUrlUseCaseImpl(shortUrlRepositoryService(), clickRepositoryService())
 
     @Bean

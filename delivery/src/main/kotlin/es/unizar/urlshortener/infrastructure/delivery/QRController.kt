@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 
-
 /**
  * The specification of the controller.
  */
@@ -25,7 +24,7 @@ interface QRController {
      *
      * **Note**: Delivery of use cases [RedirectUseCase] and [LogClickUseCase].
      */
-    fun redirectTo(id: String, request: HttpServletRequest): ResponseEntity<ByteArray>
+    fun redirectTo(id: String): ResponseEntity<ByteArray>
 }
 
 /**
@@ -40,9 +39,8 @@ class QRControllerImpl(
 ) : QRController {
 
     @GetMapping("/qr/{id}", produces = [ MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_JSON_VALUE ])
-    override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ByteArray> {
+    override fun redirectTo(@PathVariable id: String): ResponseEntity<ByteArray> =
         qrUrlUseCase.generateQR(id).let{
-            return ResponseEntity.status(HttpStatus.OK).body(it)
+            ResponseEntity.status(HttpStatus.OK).body(it)
         }
-    }
 }
