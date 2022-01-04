@@ -1,15 +1,18 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.Format
+import es.unizar.urlshortener.core.QRCode2
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
+import es.unizar.urlshortener.core.usecases.QRUrlUseCase
 import es.unizar.urlshortener.core.usecases.RedirectUseCase
+import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.util.*
 import javax.servlet.http.HttpServletRequest
-import es.unizar.urlshortener.core.usecases.QRUrlUseCase
-
 
 /**
  * The specification of the controller.
@@ -21,7 +24,7 @@ interface QRController {
      *
      * **Note**: Delivery of use cases [RedirectUseCase] and [LogClickUseCase].
      */
-    fun redirectTo(id: String, format: Format): ResponseEntity<ByteArray>
+    fun redirectTo(id: String): ResponseEntity<ByteArray>
 }
 
 /**
@@ -36,8 +39,8 @@ class QRControllerImpl(
 ) : QRController {
 
     @GetMapping("/qr/{id}", produces = [ MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_JSON_VALUE ])
-    override fun redirectTo(@PathVariable id: String, format: Format): ResponseEntity<ByteArray> =
-        qrUrlUseCase.generateQR(id, format).let{
+    override fun redirectTo(@PathVariable id: String): ResponseEntity<ByteArray> =
+        qrUrlUseCase.generateQR(id).let{
             ResponseEntity.status(HttpStatus.OK).body(it)
         }
 }

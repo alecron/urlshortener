@@ -13,6 +13,12 @@ data class Click(
     val created: OffsetDateTime = OffsetDateTime.now()
 )
 
+data class SimpleClick(
+        val hash: String,
+        val browser: String? = null,
+        val platform: String? = null
+)
+
 /**
  * A [ShortUrl] is the mapping between a remote url identified by [redirection] and a local short url identified by [hash].
  */
@@ -21,6 +27,20 @@ data class ShortUrl(
     val redirection: Redirection,
     val created: OffsetDateTime = OffsetDateTime.now(),
     val properties: ShortUrlProperties = ShortUrlProperties()
+)
+
+/**
+ * A [QRCode] is the mapping between a qr code identified by [qrCode] and a local short url identified by [hash].
+ */
+data class QRCode(
+        val hash: String,
+        val format: Format = Format(),
+        val qrCode: ByteArray? = null
+)
+
+data class QRCode2(
+        @JsonProperty("hash") val hash: String,
+        @JsonProperty("format") val format: Format = Format()
 )
 
 data class ShortUrlCSV(
@@ -64,7 +84,7 @@ data class ShortUrlProperties(
     val ip: String? = null,
     val sponsor: String? = null,
     val safe: Boolean = true,
-    var reachable: Boolean = true,
+    var reachable: Boolean = false,
     val owner: String? = null,
     val country: String? = null
 )

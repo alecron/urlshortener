@@ -26,10 +26,22 @@ import java.util.concurrent.Executor
 class ApplicationConfiguration(
     @Autowired val shortUrlEntityRepository: ShortUrlEntityRepository,
     @Autowired val clickEntityRepository: ClickEntityRepository,
-    @Autowired val csvUrlEntityRepository: CsvUrlEntityRepository
-)  {
+    @Autowired val csvUrlEntityRepository: CsvUrlEntityRepository,
+    @Autowired val qrCodeEntityRepository: QRCodeEntityRepository
+) {
 
-    @Bean
+
+    @Bean(name = ["taskExecutorUriInformation"])
+    fun executorTask(): Executor? {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = 4
+        executor.maxPoolSize = 10
+        executor.setQueueCapacity(150)
+        executor.initialize()
+        return executor
+    }
+
+    @Bean(name = ["taskExecutorReachable"])
     fun taskExecutor(): Executor? {
         val executor = ThreadPoolTaskExecutor()
         executor.corePoolSize = 4
@@ -38,6 +50,8 @@ class ApplicationConfiguration(
         executor.initialize()
         return executor
     }
+
+
     @Bean
     fun clickRepositoryService() = ClickRepositoryServiceImpl(clickEntityRepository)
 
@@ -46,6 +60,9 @@ class ApplicationConfiguration(
 
     @Bean
     fun csvUrlRepositoryService() = CsvUrlRepositoryServiceImpl(csvUrlEntityRepository)
+
+    @Bean
+    fun qrCodeRepositoryService() = QRCodeRepositoryServiceImpl(qrCodeEntityRepository)
 
     @Bean
     fun validatorService() = ValidatorServiceImpl()
@@ -63,8 +80,11 @@ class ApplicationConfiguration(
     fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
 
     @Bean
-    fun qrUrlUseCase() = QRUrlUseCaseImpl(shortUrlRepositoryService(), qrService())
-  
+    fun qrUrlUseCase() = QRUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), qrService(), qrCodeRepositoryService())
+
+    @Bean
+    fun infoShortUrlUseCase() = InfoShortUrlUseCaseImpl(shortUrlRepositoryService(), clickRepositoryService())
+
     @Bean
     fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService())
 

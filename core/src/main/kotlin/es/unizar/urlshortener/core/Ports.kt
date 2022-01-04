@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture
  */
 interface ClickRepositoryService {
     fun save(cl: Click): Click
+    fun findAllByHash(hash: String): List<Click>
 }
 
 /**
@@ -22,6 +23,14 @@ interface CsvUrlRepositoryService {
     fun save(csvurl: CsvUrl): CsvUrl
     fun findAllByuuid(uuid: String) : List<CsvUrl>
     fun countByUuid(uuid: String) : Long
+}
+
+/**
+ * [QRCodeRepositoryService] is the port to the repository that provides management to [QRCode][QRCode].
+ */
+interface QRCodeRepositoryService {
+    fun findByKey(id: String): QRCode?
+    fun save(qrCode: QRCode): QRCode
 }
 
 /**

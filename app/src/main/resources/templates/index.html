@@ -37,9 +37,74 @@
                         </div>
                         <div class="form-check d-flex justify-content-center mt-2">
                             <input class="form-check-input" type="checkbox" id="qr" name="qr">
+                            <script type="text/javascript">
+                                function qr_onclick() {
+                                    var withQR = $("#qr").is(":checked")
+                                    if (withQR){
+                                        document.getElementById("specifyQRFormat").style.visibility = 'visible';
+                                    } 
+                                    else{
+                                        document.getElementById("specifyQRFormat").style.visibility = 'hidden';
+                                    }
+                                }
+                                document.getElementById("qr").onclick = qr_onclick
+                           </script>
                             <label class="form-check-label" for="qr">
                                 Generate QR
                             </label>
+                        </div>
+                        <div class="form-check d-flex justify-content-center mt-2" id="specifyQRFormat" style= "visibility:hidden">
+                            <input class="form-check-input" type="checkbox" id="specifyFormat" name="specifyFormat">
+                            <script type="text/javascript">
+                                function specifyFormat_onclick() {
+                                    var withFormat = $("#specifyFormat").is(":checked")
+                                    if (withFormat){
+                                        document.getElementById("qrFormat").style.visibility = 'visible';
+                                    } 
+                                    else{
+                                        document.getElementById("qrFormat").style.visibility = 'hidden';
+                                    }
+                                }
+                                document.getElementById("specifyFormat").onclick = specifyFormat_onclick
+                           </script>
+                            <label class="form-check-label" for="qr">
+                                Do you want to specify a qr format?
+                            </label>
+                        </div>
+                        <div id="qrFormat" style= "visibility:hidden">
+                            <div>
+                                <label for="qrHeight">Height (1-1000):</label>
+                                <input type="number" id="qrHeight" name="qrHeight" value="500" min="1" max="1000">
+                            </div>
+                            <div>
+                                <label for="qrWidth">Width (1-1000):</label>
+                                <input type="number" id="qrWidth" name="qrWidth" value="500" min="1" max="1000">
+                            </div>
+                            <div>
+                                <label for="qrColor">Color:</label>
+                                <input type="color" id="qrColor" name="qrColor" value=#000000>
+                            </div>
+                            <div>
+                                <label for="qrBackground">Background:</label>
+                                <input type="color" id="qrBackground" name="qrBackground" value=#FFFFFF>
+                            </div>
+                            <div>
+                                <label for="qrTypeImage">Type Image:</label>
+                                <select id="qrTypeImage" name="qrTypeImage">
+                                    <option value="PNG" selected>PNG</option>
+                                    <option value="JPEG">JPEG</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="qrErrorCorrectionLevel">Error correction level:</label>
+                                <select id="qrErrorCorrectionLevel" name="qrErrorCorrectionLevel">
+                                    <option value="L" selected>L = ~7% correction</option>
+                                    <option value="M">M = ~15% correction</option>
+                                    <option value="Q">Q = ~25% correction</option>
+                                    <option value="H">H = ~30% correction</option>
+                                </select>
+                            </div>
+                            
                         </div>
                     </form>
 

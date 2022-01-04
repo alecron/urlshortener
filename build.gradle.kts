@@ -39,8 +39,9 @@ project(":core") {
     dependencies {
         "implementation"("org.springframework.boot:spring-boot-starter-amqp")
         "implementation"("io.ktor:ktor-client-core:1.6.5")
-        "implementation"("com.fasterxml.jackson.module:jackson-module-kotlin")
         "implementation" ("io.ktor:ktor-client-cio:1.6.5")
+        "implementation" ("com.fasterxml.jackson.module:jackson-module-kotlin")
+
         "implementation"("org.springframework.boot:spring-boot-starter")
     }
     tasks.getByName<BootJar>("bootJar") {
@@ -81,6 +82,7 @@ project(":delivery") {
         "implementation" ("io.ktor:ktor-client-cio:1.6.5")
         //CSV
         "implementation" ("org.apache.commons:commons-csv:1.5")
+        //Rabbitmq
         "implementation"("org.springframework.boot:spring-boot-starter-amqp")
 
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
@@ -115,5 +117,8 @@ project(":app") {
         "testImplementation"("org.mockito.kotlin:mockito-kotlin:3.2.0")
         "testImplementation"("com.fasterxml.jackson.module:jackson-module-kotlin")
         "testImplementation"("org.apache.httpcomponents:httpclient")
+
+        //Rabbitmq
+        "implementation"("org.springframework.boot:spring-boot-starter-amqp")
     }
 }

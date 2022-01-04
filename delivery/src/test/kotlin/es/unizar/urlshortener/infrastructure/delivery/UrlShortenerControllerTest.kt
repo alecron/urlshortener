@@ -1,10 +1,7 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.*
-import es.unizar.urlshortener.core.usecases.CreateCsvUseCase
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
-import es.unizar.urlshortener.core.usecases.LogClickUseCase
-import es.unizar.urlshortener.core.usecases.RedirectUseCase
+import es.unizar.urlshortener.core.usecases.*
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.never
@@ -36,6 +33,9 @@ class UrlShortenerControllerTest {
 
     @MockBean
     private lateinit var logClickUseCase: LogClickUseCase
+
+    @MockBean
+    private lateinit var infoShortUrlUseCase: InfoShortUrlUseCase
 
     @MockBean
     private lateinit var createShortUrlUseCase: CreateShortUrlUseCase

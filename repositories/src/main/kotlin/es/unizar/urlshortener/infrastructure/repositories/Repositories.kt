@@ -12,12 +12,23 @@ interface ShortUrlEntityRepository : JpaRepository<ShortUrlEntity, String> {
 }
 
 /**
+ * Specification of the repository of [QRCodeEntity].
+ *
+ * **Note**: Spring Boot is able to discover this [JpaRepository] without further configuration.
+ */
+interface QRCodeEntityRepository : JpaRepository<QRCodeEntity, String> {
+    fun findByHash(hash: String): QRCodeEntity?
+}
+
+/**
  * Specification of the repository of [ClickEntity].
  *
  * **Note**: Spring Boot is able to discover this [JpaRepository] without further configuration.
  */
-interface ClickEntityRepository : JpaRepository<ClickEntity, Long>
-
+interface ClickEntityRepository : JpaRepository<ClickEntity, Long>{
+    //Revisar sintaxis
+    fun findAllByHash(hash: String) : List<ClickEntity>
+}
 
 interface CsvUrlEntityRepository : JpaRepository<CsvUrlEntity, Long> {
     fun countByUuid(uuid : String) : Long
