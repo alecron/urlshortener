@@ -26,7 +26,7 @@ class QRUrlUseCaseImpl(
         val redirection : Redirection = su?.redirection
                 ?: throw RedirectionNotFound(id)
         //Check url is reachable
-        if (!su.properties.reachable) {
+        if (su.properties.validated && !su.properties.reachable) {
             throw UrlNotReachable(redirection.target)
         }
         //if the hash exists in the db, the program returns the qr code stored in the db

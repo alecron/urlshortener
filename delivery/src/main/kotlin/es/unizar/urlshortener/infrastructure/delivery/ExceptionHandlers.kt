@@ -52,6 +52,12 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     protected fun urlNotReachable(ex: UrlNotReachable) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
 
     @ResponseBody
+    @ExceptionHandler(value = [UrlNotValidatedYet::class])
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun urlNotValidatedYet(ex: UrlNotValidatedYet) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
+
+
+    @ResponseBody
     @ExceptionHandler(value = [EmptyFile::class])
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun emptyFile(ex: EmptyFile) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
