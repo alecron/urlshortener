@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.never
 import org.mockito.kotlin.verify
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -33,6 +34,9 @@ class UrlShortenerControllerTest {
 
     @MockBean
     private lateinit var logClickUseCase: LogClickUseCase
+
+    @MockBean(name="qrtemplate")
+    private lateinit var template: RabbitTemplate
 
     @MockBean
     private lateinit var infoShortUrlUseCase: InfoShortUrlUseCase
