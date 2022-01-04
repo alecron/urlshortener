@@ -17,3 +17,9 @@ interface ShortUrlEntityRepository : JpaRepository<ShortUrlEntity, String> {
  * **Note**: Spring Boot is able to discover this [JpaRepository] without further configuration.
  */
 interface ClickEntityRepository : JpaRepository<ClickEntity, Long>
+
+
+interface CsvUrlEntityRepository : JpaRepository<CsvUrlEntity, Long> {
+    fun countByUuid(uuid : String) : Long
+    fun findAllByUuid(uuid : String) : List<CsvUrlEntity>
+}

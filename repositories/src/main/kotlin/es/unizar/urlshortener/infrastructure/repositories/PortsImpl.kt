@@ -1,9 +1,6 @@
 package es.unizar.urlshortener.infrastructure.repositories
 
-import es.unizar.urlshortener.core.Click
-import es.unizar.urlshortener.core.ClickRepositoryService
-import es.unizar.urlshortener.core.ShortUrl
-import es.unizar.urlshortener.core.ShortUrlRepositoryService
+import es.unizar.urlshortener.core.*
 
 /**
  * Implementation of the port [ClickRepositoryService].
@@ -25,3 +22,13 @@ class ShortUrlRepositoryServiceImpl(
     override fun save(su: ShortUrl): ShortUrl = shortUrlEntityRepository.save(su.toEntity()).toDomain()
 }
 
+class CsvUrlRepositoryServiceImpl(
+        private val csvUrlEntityRepository: CsvUrlEntityRepository
+) : CsvUrlRepositoryService {
+    override fun save(csvurl: CsvUrl): CsvUrl = csvUrlEntityRepository.save(csvurl.toEntity()).toDomain()
+
+    override fun findAllByuuid(uuid: String): List<CsvUrl> = csvUrlEntityRepository.findAllByUuid(uuid).map{ it.toDomain() }
+
+    override fun countByUuid(uuid: String): Long = csvUrlEntityRepository.countByUuid(uuid)
+
+}

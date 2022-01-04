@@ -72,7 +72,6 @@ class HashServiceImpl : HashService {
  */
 class QRServiceImpl : QRService {
     override fun generateQR(url: String, format: Format): ByteArray {
-        println("Estoy en QRService")
         // Check Size
         if (format.height <= 0 || format.width <= 0) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Height and width must be greater than 0")

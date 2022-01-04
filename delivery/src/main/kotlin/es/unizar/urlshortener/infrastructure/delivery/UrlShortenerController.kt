@@ -17,6 +17,8 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.ui.Model
+import org.springframework.ui.set
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
@@ -24,6 +26,7 @@ import java.io.*
 import java.lang.System.out
 import java.net.URI
 import java.nio.file.Files
+import java.util.*
 import javax.servlet.http.HttpServletRequest
 
 /**
@@ -31,13 +34,15 @@ import javax.servlet.http.HttpServletRequest
  */
 interface UrlShortenerController {
 
+
+    fun redirectTo(id: String, remoteAddr: String): URI
+
     /**
      * Redirects and logs a short url identified by its [id].
      *
      * **Note**: Delivery of use cases [RedirectUseCase] and [LogClickUseCase].
      */
     fun redirectTo(id: String, request: HttpServletRequest): ResponseEntity<Void>
-
     /**
      * Creates a short url from details provided in [data].
      *
@@ -46,7 +51,7 @@ interface UrlShortenerController {
     fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
 
 
-    fun csvProcessor(file : MultipartFile, qr : Boolean, request: HttpServletRequest) : ResponseEntity<Resource>
+    //fun csvProcessor(file : MultipartFile, qr : Boolean, request: HttpServletRequest) : ResponseEntity<Resource>
 }
 
 /**
@@ -78,8 +83,8 @@ class UrlShortenerControllerImpl(
     val redirectUseCase: RedirectUseCase,
     val logClickUseCase: LogClickUseCase,
     val createShortUrlUseCase: CreateShortUrlUseCase,
-    val createCsvUseCase: CreateCsvUseCase,
-    private val validatorService: ValidatorService
+    //val createCsvUseCase: CreateCsvUseCase,
+    //private val validatorService: ValidatorService
 ) : UrlShortenerController {
 
     @GetMapping("/tiny-{id:.*}")
@@ -90,6 +95,13 @@ class UrlShortenerControllerImpl(
             h.location = URI.create(it.target)
             ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
         }
+
+    override fun redirectTo(id: String, remoteAddr: String): URI {
+        val red = redirectUseCase.redirectTo(id)
+        logClickUseCase.logClick(id, ClickProperties(ip = remoteAddr))
+        val h = HttpHeaders()
+        return URI.create(red.target)
+    }
 
     @PostMapping("/api/link", consumes = [ MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> =
@@ -105,7 +117,7 @@ class UrlShortenerControllerImpl(
             h.location = url
             var response : ShortUrlDataOut
             if (data.qr != null && data.qr == true){
-                val qr = linkTo<QRControllerImpl> { redirectTo(it.hash, Format(), request) }.toUri()
+                val qr = linkTo<QRControllerImpl> { redirectTo(it.hash, Format()) }.toUri()
                 response = ShortUrlDataOut(
                     url = url,
                     qr = qr,
@@ -124,61 +136,64 @@ class UrlShortenerControllerImpl(
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }
 
-    @PostMapping("/csv")
-    override fun csvProcessor(@RequestParam("file") file : MultipartFile, @RequestParam("qr") qr : Boolean, request: HttpServletRequest) : ResponseEntity<Resource>  {
-        if(file.isEmpty){
-            throw EmptyFile(file.name)
-        } else{
-
-            val reader = BufferedReader(InputStreamReader(file.inputStream))
-            val csvParser = CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(',') )
-            val byteArrayOutputStream = ByteArrayOutputStream()
-            val writer = BufferedWriter(OutputStreamWriter(byteArrayOutputStream))
-            val csvPrinter = CSVPrinter(writer, CSVFormat.DEFAULT.withDelimiter(',') )
-
-            val firstURL = generarCsv(csvParser, csvPrinter, request, qr)
-
-            val fileInputStream = InputStreamResource(ByteArrayInputStream(byteArrayOutputStream.toByteArray()))
-            val h = HttpHeaders()
-            h.location = firstURL
-            h.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=uriFile.csv")
-            h.set(HttpHeaders.CONTENT_TYPE, "text/csv")
-            return ResponseEntity(
-                    fileInputStream,
-                    h,
-                    HttpStatus.OK
-            )
-        }
-    }
-
-    private fun generarCsv(csvParser: CSVParser, csvPrinter: CSVPrinter, request: HttpServletRequest, qr: Boolean): URI? {
-        var firstURL: URI? = null
-
-        csvParser.map { it.map { it }.map {
-                createCsvUseCase.transform(it, request.remoteAddr)
-            }.map {
-                // Si es shortURL -> lista de los elementos que se guardan
-                // Si no se guarda la propia cadena y ya
-                if (it is ShortUrlCSV) {
-                    val urlHash = it.shortUrl.hash
-                    val uriRecord = linkTo<UrlShortenerControllerImpl> { redirectTo(urlHash, request) }.toString()
-                    var qrRecord = ""
-                    if(qr) qrRecord = linkTo<QRControllerImpl> { redirectTo(urlHash, Format(), request) }.toString()
-                    if(firstURL == null){
-                        // Se guarda la primera URI acortada
-                        firstURL = linkTo<UrlShortenerControllerImpl> { redirectTo(urlHash, request) }.toUri()
-                    }
-                    csvPrinter.printRecord(it.url, uriRecord, "", qrRecord)
-                } else if(it is String) {
-                    csvPrinter.printRecord(it.split(','))
-                }
-            }
-        }
-
-        csvPrinter.flush()
-        csvPrinter.close()
-
-        return firstURL
-    }
+//    @PostMapping("/csv")
+//    override fun csvProcessor(@RequestParam("file") file : MultipartFile, @RequestParam("qr") qr : Boolean, request: HttpServletRequest) : ResponseEntity<Resource>  {
+//        if(file.isEmpty){
+//            throw EmptyFile(file.name)
+//        } else{
+//
+//            val reader = BufferedReader(InputStreamReader(file.inputStream))
+//            val csvParser = CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(',') )
+//            val byteArrayOutputStream = ByteArrayOutputStream()
+//            val writer = BufferedWriter(OutputStreamWriter(byteArrayOutputStream))
+//            val csvPrinter = CSVPrinter(writer, CSVFormat.DEFAULT.withDelimiter(',') )
+//
+//            val firstURL = generarCsv(csvParser, csvPrinter, request, qr)
+//
+//            val fileInputStream = InputStreamResource(ByteArrayInputStream(byteArrayOutputStream.toByteArray()))
+//            val h = HttpHeaders()
+//            h.location = firstURL
+//            h.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=uriFile.csv")
+//            h.set(HttpHeaders.CONTENT_TYPE, "text/csv")
+//            return ResponseEntity(
+//                    fileInputStream,
+//                    h,
+//                    HttpStatus.OK
+//            )
+//        }
+//    }
+//
+//    private fun generarCsv(csvParser: CSVParser, csvPrinter: CSVPrinter, request: HttpServletRequest, qr: Boolean): URI? {
+//        var firstURL: URI? = null
+//
+//        csvParser.map { it.map { it }.map {
+//                createCsvUseCase.transform(it, request.remoteAddr)
+//            }.map {
+//                // Si es shortURL -> lista de los elementos que se guardan
+//                // Si no se guarda la propia cadena y ya
+//                if (it is ShortUrlCSV) {
+//                    val urlHash = it.shortUrl.hash
+//                    val uriRecord = linkTo<UrlShortenerControllerImpl> { redirectTo(urlHash, request) }.toString()
+//
+//                    println(uriRecord)
+//
+//                    var qrRecord = ""
+//                    if(qr) qrRecord = linkTo<QRControllerImpl> { redirectTo(urlHash, Format()) }.toString()
+//                    if(firstURL == null){
+//                        // Se guarda la primera URI acortada
+//                        firstURL = linkTo<UrlShortenerControllerImpl> { redirectTo(urlHash, request) }.toUri()
+//                    }
+//                    csvPrinter.printRecord(it.url, uriRecord, "", qrRecord)
+//                } else if(it is String) {
+//                    csvPrinter.printRecord(it.split(','))
+//                }
+//            }
+//        }
+//
+//        csvPrinter.flush()
+//        csvPrinter.close()
+//
+//        return firstURL
+//    }
 
 }

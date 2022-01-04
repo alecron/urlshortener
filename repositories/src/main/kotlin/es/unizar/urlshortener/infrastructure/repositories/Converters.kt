@@ -66,3 +66,19 @@ fun ShortUrl.toEntity() = ShortUrlEntity(
     country = properties.country
 )
 
+fun CsvUrl.toEntity() = CsvUrlEntity(
+    id = null,
+    uuid = uuid,
+    urlHash = urlHash,
+    originalUri = originalUri,
+    comment = comment,
+    qrRecord = qrRecord
+)
+
+fun CsvUrlEntity.toDomain() = CsvUrl(
+    uuid = uuid,
+    urlHash = urlHash,
+    originalUri = originalUri,
+    comment = comment,
+    qrRecord = qrRecord
+)

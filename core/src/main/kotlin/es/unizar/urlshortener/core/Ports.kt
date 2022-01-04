@@ -18,6 +18,12 @@ interface ShortUrlRepositoryService {
     fun save(su: ShortUrl): ShortUrl
 }
 
+interface CsvUrlRepositoryService {
+    fun save(csvurl: CsvUrl): CsvUrl
+    fun findAllByuuid(uuid: String) : List<CsvUrl>
+    fun countByUuid(uuid: String) : Long
+}
+
 /**
  * [ValidatorService] is the port to the service that validates if an url can be shortened.
  *

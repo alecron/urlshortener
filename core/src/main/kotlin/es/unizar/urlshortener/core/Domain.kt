@@ -1,5 +1,6 @@
 package es.unizar.urlshortener.core
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -23,9 +24,29 @@ data class ShortUrl(
 )
 
 data class ShortUrlCSV(
-        val url: String? = null,
-        val shortUrl: ShortUrl
+    val url: String? = null,
+    val shortUrl: ShortUrl
 )
+
+data class ShortUrlCSVRabbit(
+    @JsonProperty("url")
+    val url: String,
+    @JsonProperty("remoteAddr")
+    val remoteAddr: String,
+    @JsonProperty("id")
+    val id: String,
+    @JsonProperty("qr")
+    val qr: Boolean?
+)
+
+data class CsvUrl(
+        val uuid: String,
+        var urlHash: String,
+        val originalUri: String,
+        val comment: String?,
+        val qrRecord: String?
+)
+
 
 /**
  * A [Redirection] specifies the [target] and the [status code][mode] of a redirection.
@@ -67,10 +88,10 @@ data class ClickProperties(
  * By default, the [typeImage] is "image/png"
  */
 data class Format (
-        val height: Int = 500,
-        val width: Int = 500,
-        val color: String = "0xFF000000",       //0xFFFF6666
-        val background: String = "0xFFFFFFFF",  //0xFFFFCCCC
-        val typeImage: String = "PNG",
-        val errorCorrectionLevel: String = "L"
+    val height: Int = 500,
+    val width: Int = 500,
+    val color: String = "0xFF000000",       //0xFFFF6666
+    val background: String = "0xFFFFFFFF",  //0xFFFFCCCC
+    val typeImage: String = "PNG",
+    val errorCorrectionLevel: String = "L"
 )

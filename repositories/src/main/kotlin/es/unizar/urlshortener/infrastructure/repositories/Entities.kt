@@ -40,3 +40,16 @@ class ShortUrlEntity(
     val ip: String?,
     val country: String?
 )
+
+@Entity
+@Table(name="csvurl")
+class CsvUrlEntity(
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        val id: Long?,
+        val uuid: String,
+        val urlHash: String,
+        val originalUri: String,
+        val comment: String?,
+        val qrRecord: String?
+)
