@@ -25,21 +25,21 @@ class RabbitConfig : RabbitListenerConfigurer {
     val ROUTING_KEY = "csvqueue_routingKey"
 
     @Bean
-    fun queue() = Queue(QUEUE)
+    fun csvqueue() = Queue(QUEUE)
 
     @Bean
-    fun exchange() = TopicExchange(EXCHANGE)
+    fun csvexchange() = TopicExchange(EXCHANGE)
 
     @Bean
-    fun binding() = BindingBuilder.bind(queue()).to(exchange()).with(ROUTING_KEY)
+    fun csvbinding() = BindingBuilder.bind(csvqueue()).to(csvexchange()).with(ROUTING_KEY)
 
     @Bean
-    fun converter() = Jackson2JsonMessageConverter()
+    fun csvconverter() = Jackson2JsonMessageConverter()
 
-    @Bean
-    fun template(connectionFactory: ConnectionFactory): RabbitTemplate {
+    @Bean(name=["csvtemplate"])
+    fun csvtemplate(connectionFactory: ConnectionFactory): RabbitTemplate {
         val rabbitTemplate = RabbitTemplate(connectionFactory)
-        rabbitTemplate.messageConverter = converter()
+        rabbitTemplate.messageConverter = csvconverter()
         return rabbitTemplate
     }
 

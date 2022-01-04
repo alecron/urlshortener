@@ -19,21 +19,21 @@ class RabbitConfigQR {
     val ROUTING_KEY = "QR_routingKey"
 
     @Bean
-    fun queue() = Queue(QUEUE)
+    fun qrqueue() = Queue(QUEUE)
 
     @Bean
-    fun exchange() = TopicExchange(EXCHANGE)
+    fun qrexchange() = TopicExchange(EXCHANGE)
 
     @Bean
-    fun binding() = BindingBuilder.bind(queue()).to(exchange()).with(ROUTING_KEY)
+    fun qrbinding() = BindingBuilder.bind(qrqueue()).to(qrexchange()).with(ROUTING_KEY)
 
     @Bean
-    fun converter() = Jackson2JsonMessageConverter()
+    fun qrconverter() = Jackson2JsonMessageConverter()
 
-    @Bean
-    fun template(connectionFactory: ConnectionFactory): RabbitTemplate {
+    @Bean(name=["qrtemplate"])
+    fun qrtemplate(connectionFactory: ConnectionFactory): RabbitTemplate {
         val rabbitTemplate = RabbitTemplate(connectionFactory)
-        rabbitTemplate.messageConverter = converter()
+        rabbitTemplate.messageConverter = qrconverter()
         return rabbitTemplate
     }
 }

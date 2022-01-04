@@ -4,12 +4,15 @@ import es.unizar.urlshortener.core.*
 import es.unizar.urlshortener.core.usecases.CreateCsvUseCase
 import es.unizar.urlshortener.infrastructure.delivery.QRControllerImpl
 import org.springframework.amqp.rabbit.annotation.RabbitListener
+import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.stereotype.Component
 
 @Component
 class CsvConsumer(
         val createCsvUseCase: CreateCsvUseCase,
+        @Qualifier("qrtemplate") val template: RabbitTemplate,
         private val csvUrlRepositoryService: CsvUrlRepositoryService
 ) {
     @RabbitListener(queues = ["csvqueue"])
@@ -20,7 +23,9 @@ class CsvConsumer(
 
             var qrRecord = ""
             if (recibo.qr != null && recibo.qr!!) {
-                qrRecord = linkTo<QRControllerImpl> { redirectTo(urlHash, Format()) }.toString()
+                template?.convertAndSend("QR_exchange", "QR_routingKey", QRCode2(urlHash, Format()))
+
+                qrRecord = linkTo<QRControllerImpl> { redirectTo(urlHash) }.toUri().toString()
             }
 
             val csvurl = CsvUrl(

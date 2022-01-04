@@ -15,6 +15,7 @@ import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.io.InputStreamResource
 import org.springframework.core.io.InputStreamSource
 import org.springframework.core.io.Resource
@@ -97,17 +98,15 @@ data class ShortUrlDataOut(
  */
 @RestController
 class UrlShortenerControllerImpl(
-    val redirectUseCase: RedirectUseCase,
-    val logClickUseCase: LogClickUseCase,
-    val createShortUrlUseCase: CreateShortUrlUseCase,
+        val redirectUseCase: RedirectUseCase,
+        val logClickUseCase: LogClickUseCase,
+        val createShortUrlUseCase: CreateShortUrlUseCase,
+        @Qualifier("qrtemplate") val template: RabbitTemplate,
     //val createCsvUseCase: CreateCsvUseCase,
     //private val validatorService: ValidatorService
-    val infoShortUrlUseCase: InfoShortUrlUseCase,
+        val infoShortUrlUseCase: InfoShortUrlUseCase
 ) : UrlShortenerController {
-
-    @Autowired
-    private val template: RabbitTemplate? = null
-
+    
     @GetMapping("/tiny-{id:.*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void> =
          redirectUseCase.redirectTo(id).let {

@@ -10,6 +10,7 @@ import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
 import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.io.InputStreamResource
 import org.springframework.core.io.InputStreamSource
 import org.springframework.core.io.Resource
@@ -41,7 +42,7 @@ import javax.servlet.http.HttpServletRequest
 class MainPageController(
         val sseRepository: SseRepository,
         val csvUrlRepositoryService: CsvUrlRepositoryService,
-        val template: RabbitTemplate
+        @Qualifier("csvtemplate") val template: RabbitTemplate
 ){
 
     val QUEUE = "csvqueue"
