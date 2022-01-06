@@ -84,6 +84,14 @@ project(":delivery") {
         "implementation" ("org.apache.commons:commons-csv:1.5")
         //Rabbitmq
         "implementation"("org.springframework.boot:spring-boot-starter-amqp")
+        //Swagger and OpenAPI
+        "implementation" ("org.springdoc:springdoc-openapi-ui:1.5.2")
+        "implementation" ("io.springfox:springfox-swagger2:3.0.0")
+        "implementation" ("io.springfox:springfox-spring-web:3.0.0")
+        "implementation" ("io.springfox:springfox-oas:3.0.0")
+        "implementation"("io.swagger:swagger-annotations:1.5.21")
+        "implementation"("io.swagger:swagger-models:1.5.21")
+        "implementation"("io.springfox:springfox-boot-starter:3.0.0")
 
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         "testImplementation"("org.mockito.kotlin:mockito-kotlin:3.2.0")
@@ -106,6 +114,15 @@ project(":app") {
         "implementation"("org.webjars:jquery:2.1.4")
         "implementation"("org.springframework.boot:spring-boot-starter-amqp")
         "implementation"("org.webjars.npm:htmx.org:1.6.0")
+        "implementation"("com.google.guava:guava:23.0")
+        //Swagger and OpenAPI
+        "implementation" ("org.springdoc:springdoc-openapi-ui:1.5.2")
+        "implementation" ("io.springfox:springfox-swagger2:3.0.0")
+        "implementation" ("io.springfox:springfox-spring-web:3.0.0")
+        "implementation" ("io.springfox:springfox-oas:3.0.0")
+        "implementation"("io.swagger:swagger-annotations:1.5.21")
+        "implementation"("io.swagger:swagger-models:1.5.21")
+        "implementation"("io.springfox:springfox-boot-starter:3.0.0")
 
         "runtimeOnly"("org.hsqldb:hsqldb")
 

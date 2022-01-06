@@ -32,7 +32,6 @@ import java.nio.file.Files
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 
-
 /**
  * The implementation of the controller.
  *
@@ -57,7 +56,14 @@ class MainPageController(
     }
 
     @PostMapping("/csv")
-    fun csvUpload(@RequestParam("uuid") id: String, @RequestParam("file") file : MultipartFile, @RequestParam("qrCSV") qr : Boolean?, request: HttpServletRequest) : String{//ResponseEntity<Resource> {
+    fun csvUpload(@RequestParam("uuid") id: String, @RequestParam("file") file : MultipartFile, @RequestParam("qrCSV") qr : Boolean?,
+                  @RequestParam("qrHeight") qrHeight: Int?,
+                  @RequestParam("qrWidth") qrWidth: Int? ,
+                  @RequestParam("qrColor") qrColor: String? ,
+                  @RequestParam("qrBackground") qrBackground: String?,
+                  @RequestParam("qrTypeImage") qrTypeImage: String? ,
+                  @RequestParam("qrErrorCorrectionLevel") qrErrorCorrectionLevel: String? ,request: HttpServletRequest) : String{//ResponseEntity<Resource> {
+        println("RECIBIDO " + id)
         if(file.isEmpty){
             throw EmptyFile(file.name)
         } else {
@@ -67,11 +73,23 @@ class MainPageController(
             var numTotal = 0
 
             csvParser.map { it.map {
+                var format:Format? = null
+                if( qr != null && qr!! ) {
+                    format = Format()
+                    val height: Int = qrHeight ?: format.height
+                    val width: Int = qrWidth ?: format.width
+                    val color: String = qrColor ?: format.color
+                    val background: String = qrBackground ?: format.background
+                    val typeImage: String = qrTypeImage ?: format.typeImage
+                    val errorCorrectionLevel: String = qrErrorCorrectionLevel ?: format.errorCorrectionLevel
+                    format = Format(height, width, color, background, typeImage, errorCorrectionLevel)
+                }
                 val toRabbit = ShortUrlCSVRabbit(
                         url = it,
                         id = id,
                         remoteAddr = request.remoteAddr,
-                        qr = qr
+                        qr = qr,
+                        format = format
                 )
                 template.convertAndSend(EXCHANGE, ROUTING_KEY,  toRabbit)
                 numTotal ++

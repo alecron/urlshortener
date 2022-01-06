@@ -77,7 +77,6 @@ $(document).ready(
                 }
             });
 
-
         $('#progress-wrapper').on("click", '#downloadbtn', function () {
             var id = $("#uuid").val()
             $.ajax({

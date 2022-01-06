@@ -1,6 +1,12 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.*
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
@@ -29,14 +35,31 @@ fun <R : Any> R.logger(): Lazy<Logger> {
     return lazy { LoggerFactory.getLogger(this::class.java.name) }
 }
 
+// Fuente: https://lankydan.dev/documenting-a-spring-rest-api-following-the-openapi-specification
 @RestController
 @RequestMapping("/csv")
+@Tag(name = "CSV", description = "Endpoint for downloading a user's generated CSV" )
 class CsvPubController(
         val csvUrlRepositoryService: CsvUrlRepositoryService
-
 ) {
     @GetMapping("/download")
-    fun csvDownload(@RequestParam("uuid") id: String, request: HttpServletRequest) : ResponseEntity<Resource>{
+    @Operation(
+            summary = "Downloads a CSV of Short URLs",
+            description = "Downloads the CSV generated for the job with the given UUID",
+            tags = ["CSV"],
+            responses = [
+                ApiResponse(
+                        description = "Success",
+                        responseCode = "200",
+                        content = [Content(mediaType = "text/csv")]
+                ),
+                ApiResponse(description = "Not found", responseCode = "404"),
+                ApiResponse(description = "Internal error", responseCode = "500")
+            ]
+    )
+    fun csvDownload(@RequestParam("uuid")
+                    @Parameter(description = "The Id assigned to the user's CSV")
+                    id: String, request: HttpServletRequest) : ResponseEntity<Resource>{
         val byteArrayOutputStream = ByteArrayOutputStream()
         val writer = BufferedWriter(OutputStreamWriter(byteArrayOutputStream))
         val csvPrinter = CSVPrinter(writer, CSVFormat.DEFAULT.withDelimiter(',') )

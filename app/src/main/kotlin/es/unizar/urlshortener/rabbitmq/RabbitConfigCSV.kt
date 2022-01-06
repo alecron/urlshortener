@@ -16,7 +16,7 @@ import org.springframework.messaging.handler.annotation.support.MessageHandlerMe
 
 
 @Configuration
-class RabbitConfig : RabbitListenerConfigurer {
+class RabbitConfigCSV : RabbitListenerConfigurer {
 
     //Based on: https://www.youtube.com/watch?v=o4qCdBR4gUM&ab_channel=JavaTechie
     // Copied on the CsvPublisherController

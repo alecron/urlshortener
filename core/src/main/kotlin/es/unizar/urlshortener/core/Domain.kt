@@ -49,14 +49,11 @@ data class ShortUrlCSV(
 )
 
 data class ShortUrlCSVRabbit(
-    @JsonProperty("url")
-    val url: String,
-    @JsonProperty("remoteAddr")
-    val remoteAddr: String,
-    @JsonProperty("id")
-    val id: String,
-    @JsonProperty("qr")
-    val qr: Boolean?
+    @JsonProperty("url") val url: String,
+    @JsonProperty("remoteAddr") val remoteAddr: String,
+    @JsonProperty("id") val id: String,
+    @JsonProperty("qr") val qr: Boolean?,
+    @JsonProperty("format") val format: Format? = Format()
 )
 
 data class CsvUrl(

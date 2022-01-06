@@ -10,7 +10,7 @@ import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.stereotype.Component
 
 @Component
-class CsvConsumer(
+class RabbitConsumerCSV(
         val createCsvUseCase: CreateCsvUseCase,
         @Qualifier("qrtemplate") val template: RabbitTemplate,
         private val csvUrlRepositoryService: CsvUrlRepositoryService
@@ -22,8 +22,8 @@ class CsvConsumer(
             val urlHash = processed.shortUrl.hash
 
             var qrRecord = ""
-            if (recibo.qr != null && recibo.qr!!) {
-                template?.convertAndSend("QR_exchange", "QR_routingKey", QRCode2(urlHash, Format()))
+            if (recibo.qr != null && recibo.qr!! && recibo.format != null) {
+                template?.convertAndSend("QR_exchange", "QR_routingKey", QRCode2(urlHash, recibo.format!!))
 
                 qrRecord = linkTo<QRControllerImpl> { redirectTo(urlHash) }.toUri().toString()
             }

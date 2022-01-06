@@ -118,7 +118,7 @@
                                 <input class="form-control center-block " type="file" id="file" name="file">
                                 <span class="input-group-btn"><button
                                         class="btn btn-lg btn-primary"
-                                        hx-include="[name='uuid, qrCSV']"
+                                        hx-include="[name='uuid']"
                                         hx-encoding="multipart/form-data"
                                         hx-post="/csv"
                                         hx-swap="none">Upload</button></span>
@@ -126,11 +126,75 @@
                             <div class="form-check d-flex justify-content-center mt-2">
                                 <!-- Al pasar qrCSV como parámetro cambiar el nombre a qr-->
                                 <input class="form-check-input " type="checkbox" id="qrCSV" name="qrCSV">
+                                <script type="text/javascript">
+                                    function qr_onclick() {
+                                        var withQR = $("#qrCSV").is(":checked")
+                                        if (withQR){
+                                            document.getElementById("specifyQRCSVFormat").style.visibility = 'visible';
+                                        }
+                                        else{
+                                            document.getElementById("specifyQRCSVFormat").style.visibility = 'hidden';
+                                        }
+                                    }
+                                    document.getElementById("qrCSV").onclick = qr_onclick
+                                </script>
                                 <label class="form-check-label" for="qrCSV">
                                     Generate QR
                                 </label>
                             </div>
+                            <div class="form-check d-flex justify-content-center mt-2" id="specifyQRCSVFormat" style= "visibility:hidden">
+                                <input class="form-check-input" type="checkbox" id="specifyCSVqrFormat" name="specifyCSVqrFormat">
+                                <script type="text/javascript">
+                                    function specifyFormat_onclick() {
+                                        var withFormat = $("#specifyCSVqrFormat").is(":checked")
+                                        if (withFormat){
+                                            document.getElementById("qrCSVFormat").style.visibility = 'visible';
+                                        }
+                                        else{
+                                            document.getElementById("qrCSVFormat").style.visibility = 'hidden';
+                                        }
+                                    }
+                                    document.getElementById("specifyCSVqrFormat").onclick = specifyFormat_onclick
+                                </script>
+                                <label class="form-check-label" for="specifyCSVqrFormat">
+                                    Do you want to specify a qr format?
+                                </label>
+                            </div>
+                            <div id="qrCSVFormat" style= "visibility:hidden">
+                                <div>
+                                    <label for="qrHeight">Height (1-1000):</label>
+                                    <input type="number" id="qrCSVHeight" name="qrCSVHeight" value="500" min="1" max="1000">
+                                </div>
+                                <div>
+                                    <label for="qrWidth">Width (1-1000):</label>
+                                    <input type="number" id="qrCSVWidth" name="qrCSVWidth" value="500" min="1" max="1000">
+                                </div>
+                                <div>
+                                    <label for="qrColor">Color:</label>
+                                    <input type="color" id="qrCSVColor" name="qrCSVColor" value=#000000>
+                                </div>
+                                <div>
+                                    <label for="qrBackground">Background:</label>
+                                    <input type="color" id="qrCSVBackground" name="qrCSVBackground" value=#FFFFFF>
+                                </div>
+                                <div>
+                                    <label for="qrCSVTypeImage">Type Image:</label>
+                                    <select id="qrCSVTypeImage" name="qrCSVTypeImage">
+                                        <option value="PNG" selected>PNG</option>
+                                        <option value="JPEG">JPEG</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="qrCSVErrorCorrectionLevel">Error correction level:</label>
+                                    <select id="qrCSVErrorCorrectionLevel" name="qrCSVErrorCorrectionLevel">
+                                        <option value="L" selected>L = ~7% correction</option>
+                                        <option value="M">M = ~15% correction</option>
+                                        <option value="Q">Q = ~25% correction</option>
+                                        <option value="H">H = ~30% correction</option>
+                                    </select>
+                                </div>
 
+                                </div>
                             <input id="uuid" name="uuid" th:attr="value=${uuid}" type="hidden" value="">
                             <div style="margin-bottom: 2rem;"></div>
                             <div hx-sse="swap:message" id="progress-wrapper"></div>
@@ -151,5 +215,22 @@
     </div>
 </div>
 <script th:src="@{/webjars/htmx.org/dist/htmx.min.js}" type="text/javascript"></script>
+<script>
+    document.body.addEventListener('htmx:configRequest', function(evt) {
+        var withQR = $("#qrCSV").is(":checked")
+        var withFormat = $("#specifyCSVqrFormat").is(":checked")
+
+        if(withFormat){
+            evt.detail.parameters['qrHeight'] = $("#qrCSVHeight").val()
+            evt.detail.parameters['qrWidth'] = $("#qrCSVWidth").val()
+            evt.detail.parameters['qrColor'] = "0xff"+$("#qrCSVColor").val().substring(1)
+            evt.detail.parameters['qrBackground'] = "0xff"+$("#qrCSVBackground").val().substring(1)
+            evt.detail.parameter['sqrTypeImage'] = $("#qrCSVTypeImage").val()
+            evt.detail.parameters['qrErrorCorrectionLevel'] = $("#qrCSVErrorCorrectionLevel").val()
+        }
+
+        evt.detail.parameters['qrCSV'] = withQR; // add a new parameter into the mix
+    });
+</script>
 </body>
 </html>
