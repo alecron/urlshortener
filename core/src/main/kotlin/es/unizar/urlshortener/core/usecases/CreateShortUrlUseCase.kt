@@ -25,43 +25,31 @@ class CreateShortUrlUseCaseImpl(
     override fun create(url: String, data: ShortUrlProperties): ShortUrl {
         if (!validatorService.isValid(url)) {
             throw InvalidUrlException(url)
-        } else {
-            val id: String = hashService.hasUrl(url)
-            val reachable = validatorService.isReachable(url)
-            // Case url already stored and not reachable
-            val shortUrlAlreadySaved: ShortUrl? = shortUrlRepository.findByKey(id)
-            if(shortUrlAlreadySaved != null) {
-                if (shortUrlAlreadySaved.properties.validated  &&
-                    !shortUrlAlreadySaved.properties.reachable) {
-                    throw UrlNotReachable(url)
+        }
+        val id: String = hashService.hasUrl(url)
+        val reachable = validatorService.isReachable(url)
+        val su = ShortUrl(
+            hash = id,
+            redirection = Redirection(target = url),
+            properties = ShortUrlProperties(
+                safe = data.safe,
+                ip = data.ip,
+                sponsor = data.sponsor,
+            )
+        )
+        val suReturned = shortUrlRepository.save(su)
+        reachable.handleAsync { _, _ ->
+            val shortUrlSaved: ShortUrl? = shortUrlRepository.findByKey(id)
+            if (shortUrlSaved != null) {
+                if (reachable.isCompletedExceptionally) {
+                    shortUrlSaved.properties.reachable = false
+                } else {
+                    shortUrlSaved.properties.reachable = reachable.getNow(false)
                 }
-                return shortUrlAlreadySaved
-            } else {
-                val su = ShortUrl(
-                    hash = id,
-                    redirection = Redirection(target = url),
-                    properties = ShortUrlProperties(
-                        safe = data.safe,
-                        ip = data.ip,
-                        sponsor = data.sponsor,
-                    )
-                )
-                val suReturned = shortUrlRepository.save(su)
-
-                reachable.handleAsync { _, _ ->
-                    val shortUrlSaved: ShortUrl? = shortUrlRepository.findByKey(id)
-                    if(shortUrlSaved != null) {
-                        if(reachable.isCompletedExceptionally) {
-                            shortUrlSaved.properties.reachable = false
-                        } else {
-                            shortUrlSaved.properties.reachable = reachable.getNow(false)
-                        }
-                        shortUrlSaved.properties.validated = true
-                        shortUrlRepository.save(shortUrlSaved)
-                    }
-                    }
-                return suReturned
-                }
+                shortUrlSaved.properties.validated = true
+                shortUrlRepository.save(shortUrlSaved)
             }
         }
+        return suReturned
     }
+}
