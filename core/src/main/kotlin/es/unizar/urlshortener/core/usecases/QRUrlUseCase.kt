@@ -5,7 +5,6 @@ import es.unizar.urlshortener.core.*
 /**
  * Given an id returns a [ByteArray] that contains the QR code
  *
- * **Note**: This is an example of functionality.
  */
 interface QRUrlUseCase {
     fun generateQR(id: String): ByteArray

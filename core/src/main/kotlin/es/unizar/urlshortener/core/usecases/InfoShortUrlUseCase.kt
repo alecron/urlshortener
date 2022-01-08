@@ -4,7 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import es.unizar.urlshortener.core.*
 
 interface InfoShortUrlUseCase{
-    fun info(id: String): String
+    fun info(id: String): List<SimpleClick>
 }
 
 /**
@@ -14,13 +14,13 @@ class InfoShortUrlUseCaseImpl(
     private val shortUrlRepository: ShortUrlRepositoryService, 
     private val clickRepository: ClickRepositoryService
 ) : InfoShortUrlUseCase {
-    override fun info(id: String): String{
+    override fun info(id: String): List<SimpleClick> {
 
         val shortUrl = shortUrlRepository.findByKey(id)
 
         if(shortUrl==null) throw RedirectionNotFound(id)
         else {
-            //En esta val me devolverá todos los clicks
+            // Devuelve todos los clicks almacenados para el hash dado
             val clicks = clickRepository.findAllByHash(shortUrl.hash)
 
             val simpleClicks = clicks.map{
@@ -30,13 +30,7 @@ class InfoShortUrlUseCaseImpl(
                         platform = it.properties.platform
                 )
             }
-
-            val mapper = jacksonObjectMapper()
-            //Object to JSON in String
-
-            val jsonInString: String = mapper.writeValueAsString(simpleClicks)
-
-            return jsonInString
+            return simpleClicks
         }
     }
 }

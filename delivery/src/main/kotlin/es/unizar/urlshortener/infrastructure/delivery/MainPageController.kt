@@ -6,6 +6,9 @@ import es.unizar.urlshortener.core.ShortUrlProperties
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import es.unizar.urlshortener.core.*
 import es.unizar.urlshortener.core.usecases.*
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
@@ -55,7 +58,25 @@ class MainPageController(
         return "index"
     }
 
+    /**
+     * Endpoint that receives a CSV and sends the URLs to the RabbitMQ server. It updates the state of the CSV
+     * to the client via SSE.
+     */
     @PostMapping("/csv")
+    @Operation(
+            summary = "Upload a CSV of Short URLs",
+            description = "Uploads a CSV generated for the job with the given UUID",
+            tags = ["CSV"],
+            responses = [
+                ApiResponse(
+                        description = "Success",
+                        responseCode = "200",
+                        content = [Content(mediaType = "text/csv")]
+                ),
+                ApiResponse(description = "Not found", responseCode = "404"),
+                ApiResponse(description = "Internal error", responseCode = "500")
+            ]
+    )
     fun csvUpload(@RequestParam("uuid") id: String, @RequestParam("file") file : MultipartFile, @RequestParam("qrCSV") qr : Boolean?,
                   @RequestParam("qrHeight") qrHeight: Int?,
                   @RequestParam("qrWidth") qrWidth: Int? ,
@@ -63,7 +84,6 @@ class MainPageController(
                   @RequestParam("qrBackground") qrBackground: String?,
                   @RequestParam("qrTypeImage") qrTypeImage: String? ,
                   @RequestParam("qrErrorCorrectionLevel") qrErrorCorrectionLevel: String? ,request: HttpServletRequest) : String{//ResponseEntity<Resource> {
-        println("RECIBIDO " + id)
         if(file.isEmpty){
             throw EmptyFile(file.name)
         } else {

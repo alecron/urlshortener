@@ -38,7 +38,7 @@ fun <R : Any> R.logger(): Lazy<Logger> {
 // Fuente: https://lankydan.dev/documenting-a-spring-rest-api-following-the-openapi-specification
 @RestController
 @RequestMapping("/csv")
-@Tag(name = "CSV", description = "Endpoint for downloading a user's generated CSV" )
+@Tag(name = "CSV", description = "Controller for downloading a user's generated CSV" )
 class CsvPubController(
         val csvUrlRepositoryService: CsvUrlRepositoryService
 ) {

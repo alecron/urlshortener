@@ -10,6 +10,12 @@ import es.unizar.urlshortener.core.usecases.LogClickUseCase
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
 import es.unizar.urlshortener.core.usecases.RedirectUseCase
 import es.unizar.urlshortener.core.usecases.*
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
@@ -39,9 +45,6 @@ import javax.servlet.http.HttpServletRequest
  */
 interface UrlShortenerController {
 
-
-    fun redirectTo(id: String, remoteAddr: String): URI
-
     /**
      * Redirects and logs a short url identified by its [id].
      *
@@ -60,7 +63,7 @@ interface UrlShortenerController {
      *
      * **Note**: Delivery of use case [InfoShortUrlUseCase]
      */
-    fun getInfo(id: String, request: HttpServletRequest): ResponseEntity<String>
+    fun getInfo(id: String, request: HttpServletRequest): ResponseEntity<List<SimpleClick>>
 
 
     //fun csvProcessor(file : MultipartFile, qr : Boolean, request: HttpServletRequest) : ResponseEntity<Resource>
@@ -70,14 +73,23 @@ interface UrlShortenerController {
  * Data required to create a short url.
  */
 data class ShortUrlDataIn(
+    @field:Schema(description = "URL to be shorten")
     val url: String,
+    @field:Schema(description = "Tells if a QR for the URL must be created or not")
     val qr: Boolean? = null,
+    @field:Schema(description = "Height of the generated QR")
     val qrHeight: Int? = null,
+    @field:Schema(description = "Width of the generated QR")
     val qrWidth: Int? = null,
+    @field:Schema(description = "Color of the QR's pattern")
     val qrColor: String? = null,
+    @field:Schema(description = "Color of the QR's background")
     val qrBackground: String? = null,
+    @field:Schema(description = "Image type of the generated QR", example = "PNG")
     val qrTypeImage: String? = null,
+    @field:Schema(description = "Correction level of the QR that has to be generated")
     val qrErrorCorrectionLevel: String? = null,
+    @field:Schema(description = "Sponsor of the URL")
     val sponsor: String? = null
 )
 
@@ -102,13 +114,27 @@ class UrlShortenerControllerImpl(
         val logClickUseCase: LogClickUseCase,
         val createShortUrlUseCase: CreateShortUrlUseCase,
         @Qualifier("qrtemplate") val template: RabbitTemplate,
-    //val createCsvUseCase: CreateCsvUseCase,
-    //private val validatorService: ValidatorService
         val infoShortUrlUseCase: InfoShortUrlUseCase
 ) : UrlShortenerController {
     
     @GetMapping("/tiny-{id:.*}")
-    override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void> =
+    @Tag(name = "Short URL", description = "Endpoints that access a single short URL and its information" )
+    @Operation(
+            summary = "Accesses a short URL",
+            description = "Accesses a short URL stored with the given id",
+            tags = ["Short URL"],
+            responses = [
+                ApiResponse(
+                        description = "Redirect to the URL",
+                        responseCode = "307"
+                ),
+                ApiResponse(description = "Not found", responseCode = "404"),
+                ApiResponse(description = "Internal error", responseCode = "500")
+            ]
+    )
+    override fun redirectTo(@PathVariable
+                                @Parameter(description = "The id assigned to the short URL on the repository")
+                                id: String, request: HttpServletRequest): ResponseEntity<Void> =
          redirectUseCase.redirectTo(id).let {
             val browser = getClientBrowser(request)
             val platform = getClientPlatform(request)
@@ -118,24 +144,46 @@ class UrlShortenerControllerImpl(
             ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
         }
 
-    override fun redirectTo(id: String, remoteAddr: String): URI {
-        val red = redirectUseCase.redirectTo(id)
-        logClickUseCase.logClick(id, ClickProperties(ip = remoteAddr))
-        val h = HttpHeaders()
-        return URI.create(red.target)
-    }
-
-
-    @GetMapping("/{id:.*}-json")
-    override fun getInfo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<String> =
+    @GetMapping("/{id:.*}-json", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(
+            summary = "Shows the info of the clicks",
+            description = "Shows the info of the clicks of the short URL from the hash given",
+            tags = ["Short URL"],
+            responses = [
+                ApiResponse(
+                        description = "Success",
+                        responseCode = "200",
+                        content = [Content(mediaType = "application/json", schema = Schema(implementation = SimpleClick::class))]
+                ),
+                ApiResponse(description = "Not found", responseCode = "404"),
+                ApiResponse(description = "Internal error", responseCode = "500")
+            ]
+    )
+    override fun getInfo(@PathVariable
+                             @Parameter(description = "The id assigned to the short URL on the repository")
+                             id: String, request: HttpServletRequest): ResponseEntity<List<SimpleClick>> =
         redirectUseCase.redirectTo(id).let {
             val h = HttpHeaders()
             val response = infoShortUrlUseCase.info(id)
-            return ResponseEntity<String>(response, h, HttpStatus.OK)
+            return ResponseEntity<List<SimpleClick>>(response, h, HttpStatus.OK)
         }
 
 
     @PostMapping("/api/link", consumes = [ MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
+    @Operation(
+            summary = "Creates a short URL",
+            description = "Creates a Short URL if it is possible with the data sent in the request",
+            tags = ["Short URL"],
+            responses = [
+                ApiResponse(
+                        description = "Created",
+                        responseCode = "201",
+                        content = [Content(mediaType = "application/json", schema = Schema(implementation = ShortUrlDataOut::class))]
+                ),
+                ApiResponse(description = "Not found", responseCode = "404"),
+                ApiResponse(description = "Internal error", responseCode = "500")
+            ]
+    )
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> =
         createShortUrlUseCase.create(
             url = data.url,
@@ -255,65 +303,4 @@ class UrlShortenerControllerImpl(
             "UnKnown, More-Info: $browserDetails"
         }
     }
-
-//    @PostMapping("/csv")
-//    override fun csvProcessor(@RequestParam("file") file : MultipartFile, @RequestParam("qr") qr : Boolean, request: HttpServletRequest) : ResponseEntity<Resource>  {
-//        if(file.isEmpty){
-//            throw EmptyFile(file.name)
-//        } else{
-//
-//            val reader = BufferedReader(InputStreamReader(file.inputStream))
-//            val csvParser = CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(',') )
-//            val byteArrayOutputStream = ByteArrayOutputStream()
-//            val writer = BufferedWriter(OutputStreamWriter(byteArrayOutputStream))
-//            val csvPrinter = CSVPrinter(writer, CSVFormat.DEFAULT.withDelimiter(',') )
-//
-//            val firstURL = generarCsv(csvParser, csvPrinter, request, qr)
-//
-//            val fileInputStream = InputStreamResource(ByteArrayInputStream(byteArrayOutputStream.toByteArray()))
-//            val h = HttpHeaders()
-//            h.location = firstURL
-//            h.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=uriFile.csv")
-//            h.set(HttpHeaders.CONTENT_TYPE, "text/csv")
-//            return ResponseEntity(
-//                    fileInputStream,
-//                    h,
-//                    HttpStatus.OK
-//            )
-//        }
-//    }
-//
-//    private fun generarCsv(csvParser: CSVParser, csvPrinter: CSVPrinter, request: HttpServletRequest, qr: Boolean): URI? {
-//        var firstURL: URI? = null
-//
-//        csvParser.map { it.map { it }.map {
-//                createCsvUseCase.transform(it, request.remoteAddr)
-//            }.map {
-//                // Si es shortURL -> lista de los elementos que se guardan
-//                // Si no se guarda la propia cadena y ya
-//                if (it is ShortUrlCSV) {
-//                    val urlHash = it.shortUrl.hash
-//                    val uriRecord = linkTo<UrlShortenerControllerImpl> { redirectTo(urlHash, request) }.toString()
-//
-//                    println(uriRecord)
-//
-//                    var qrRecord = ""
-//                    if(qr) qrRecord = linkTo<QRControllerImpl> { redirectTo(urlHash, Format()) }.toString()
-//                    if(firstURL == null){
-//                        // Se guarda la primera URI acortada
-//                        firstURL = linkTo<UrlShortenerControllerImpl> { redirectTo(urlHash, request) }.toUri()
-//                    }
-//                    csvPrinter.printRecord(it.url, uriRecord, "", qrRecord)
-//                } else if(it is String) {
-//                    csvPrinter.printRecord(it.split(','))
-//                }
-//            }
-//        }
-//
-//        csvPrinter.flush()
-//        csvPrinter.close()
-//
-//        return firstURL
-//    }
-
 }

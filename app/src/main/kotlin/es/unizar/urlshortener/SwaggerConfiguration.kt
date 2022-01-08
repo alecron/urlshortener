@@ -14,8 +14,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 
 
 /**
+ * Swagger configuration
  * Swagger documentation interface available at:
- * http://localhost:8080/swagger-ui.html
+ * http://localhost:8080/api-ui-docs
  * Swagger metrics as a JSON file available at:
  * http://localhost:8080/api-docs
  * Swagger metrics as a YAML file available at (this will download a yaml file to your computer):

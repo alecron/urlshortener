@@ -13,6 +13,10 @@ class RabbitConsumerQR(
         private val qrService: QRService,
         private val qrCodeRepository: QRCodeRepositoryService
 ){
+    /**
+     * It consumes the QR queue and generates a QR with the given data. The generated QR is
+     * stored in the QR code repository
+     */
     @RabbitListener(queues = ["QR_queue"])
     fun consumeMessageFromQueue(qrCode: QRCode2) {
         println("Message recieved from queue : ${qrCode.hash}")

@@ -13,6 +13,9 @@ data class Click(
     val created: OffsetDateTime = OffsetDateTime.now()
 )
 
+/**
+ * A [SimpleClick] represents the information of a [Click] from a [ShortUrl] with the given [hash]
+ */
 data class SimpleClick(
         val hash: String,
         val browser: String? = null,
@@ -38,16 +41,25 @@ data class QRCode(
         val qrCode: ByteArray? = null
 )
 
+/**
+ * A [QRCode2] is the data type read by the QR rabbit queue
+ */
 data class QRCode2(
         @JsonProperty("hash") val hash: String,
         @JsonProperty("format") val format: Format = Format()
 )
 
+/**
+ * [ShortUrl] representation to generate a URL for the CSV
+ */
 data class ShortUrlCSV(
     val url: String? = null,
     val shortUrl: ShortUrl
 )
 
+/**
+ * A [ShortUrlCSVRabbit] is the data type read by the CSV rabbit queue
+ */
 data class ShortUrlCSVRabbit(
     @JsonProperty("url") val url: String,
     @JsonProperty("remoteAddr") val remoteAddr: String,
@@ -56,6 +68,9 @@ data class ShortUrlCSVRabbit(
     @JsonProperty("format") val format: Format? = Format()
 )
 
+/**
+ * Representation for the CSV url entity
+ */
 data class CsvUrl(
         val uuid: String,
         var urlHash: String,

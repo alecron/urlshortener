@@ -30,7 +30,9 @@ class ApplicationConfiguration(
     @Autowired val qrCodeEntityRepository: QRCodeEntityRepository
 ) {
 
-
+    /**
+     * Thread pool configuration for the URI information service
+     */
     @Bean(name = ["taskExecutorUriInformation"])
     fun executorTask(): Executor? {
         val executor = ThreadPoolTaskExecutor()
@@ -41,6 +43,9 @@ class ApplicationConfiguration(
         return executor
     }
 
+    /**
+     * Thread pool configuration for the Reachability service
+     */
     @Bean(name = ["taskExecutorReachable"])
     fun taskExecutor(): Executor? {
         val executor = ThreadPoolTaskExecutor()

@@ -14,7 +14,9 @@ import org.springframework.messaging.converter.MappingJackson2MessageConverter
 import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory
 import org.springframework.messaging.handler.annotation.support.MessageHandlerMethodFactory
 
-
+/**
+ * RabbitMQ configuration for the CSV Queue
+ */
 @Configuration
 class RabbitConfigCSV : RabbitListenerConfigurer {
 

@@ -20,10 +20,12 @@ class CreateCsvUseCaseImpl (
     override fun transform(url:String, remoteAddr:String):Any {
         // String -> Comentario o ShortURL
         if(!validatorService.isValid(url)){
-            // Se concatena la URL para mantener la estructura
-            // del CSV
+            // Se devuelve únicamente el comentario del error
+            // si no es una URL válida
             return "La URI no es valida "
         } else {
+            // De lo contrario se genera una URL acortada
+            // preparada para almacenar en el CSV
             return ShortUrlCSV(
                     url,
                     createShortUrlUseCase.create(

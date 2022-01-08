@@ -21,6 +21,12 @@ class SseRepository {
     }
 }
 
+/**
+ * Controller that creates an SSE emitter for a client so that the client
+ * receives updates of the state of the CSV. It also creates a download button
+ * when the CSV is completely processed to let the client download the
+ * generated CSV with the shorted URLs.
+ */
 @Controller
 class SseController(
     private val repository: SseRepository

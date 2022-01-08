@@ -15,6 +15,10 @@ class RabbitConsumerCSV(
         @Qualifier("qrtemplate") val template: RabbitTemplate,
         private val csvUrlRepositoryService: CsvUrlRepositoryService
 ) {
+    /**
+     * It consumes the CSV queue and transforms the received data into a shortenURL and stores it
+     * into the CSVUrl Repository
+     */
     @RabbitListener(queues = ["csvqueue"])
     fun consumeMessage(recibo: ShortUrlCSVRabbit){
         val processed = createCsvUseCase.transform(recibo.url, recibo.remoteAddr)
