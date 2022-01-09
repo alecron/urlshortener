@@ -43,6 +43,12 @@ open class ValidatorServiceImpl : ValidatorService {
             requestTimeoutMillis = CONNECTION_TIMEOUT
         }
     }
+    /**
+     * Check if the url [url] is reachable
+     * @return A CompletableFuture<Boolean> whose value will be true
+     * if and only if an HTTP GET petition to the url returns code [HttpStatusCode.OK]
+     * within the first [CONNECTION_TIMEOUT] seconds
+     */
     @Async("taskExecutorReachable")
     open override fun isReachable(url : String) : CompletableFuture<Boolean> {
         val response: HttpResponse?

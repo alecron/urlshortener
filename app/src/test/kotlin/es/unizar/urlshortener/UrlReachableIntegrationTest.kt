@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class HttpRequestTest {
+class UrlReachableIntegrationTest {
     @LocalServerPort
     private val port = 0
 
@@ -58,71 +58,75 @@ class HttpRequestTest {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "shorturl", "click")
     }
 
-    @Test
-    fun `main page works`() {
-        val response = restTemplate.getForEntity("http://localhost:$port/", String::class.java)
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body).contains("URL Shortener")
-    }
 
     @Test
-    fun `redirectTo returns a bad request when the key exists but hasn't been validated`() {
-        val target = shortUrl("http://unizar.es").headers.location
-        require(target != null)
-        val response = restTemplate.getForEntity(target, String::class.java)
-        Thread.sleep(4_000)
-        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-    }
-
-    @Test
-    fun `redirectTo returns a not found when the key does not exist`() {
-        val response = restTemplate.getForEntity("http://localhost:$port/f684a3c4", String::class.java)
-        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
-
-        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
-    }
-
-    @Test
-    fun `creates returns a basic redirect if it can compute a hash`() {
-        val response = shortUrl("http://example.com/")
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
-        assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/tiny-f684a3c4"))
-        assertThat(response.body?.url).isEqualTo(URI.create("http://localhost:$port/tiny-f684a3c4"))
-
-        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(1)
-        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
-    }
-
-    @Test
-    fun `creates returns bad request if it can't compute a hash`() {
+    fun `creates returns created if url is not reachable`() {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
 
         val data: MultiValueMap<String, String> = LinkedMultiValueMap()
-        data["url"] = "ftp://example.com/"
+        data["url"] = "http://www.unizarFalso.es/"
 
         val response = restTemplate.postForEntity("http://localhost:$port/api/link",
             HttpEntity(data, headers), ShortUrlDataOut::class.java)
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-
-        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(0)
-        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(1)
     }
 
-    private fun shortUrl(url: String): ResponseEntity<ShortUrlDataOut> {
+    @Test
+    fun `creates returns created if url is not reachable and redirects to that url returns bad request`() {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
 
         val data: MultiValueMap<String, String> = LinkedMultiValueMap()
-        data["url"] = url
+        data["url"] = "http://www.unizarFalso.es/"
 
-        val response =  restTemplate.postForEntity(
-            "http://localhost:$port/api/link",
-            HttpEntity(data, headers), ShortUrlDataOut::class.java
-        )
-        executor?.getThreadPoolExecutor()?.awaitTermination(3, TimeUnit.SECONDS)
-        return response
+        val response = restTemplate.postForEntity("http://localhost:$port/api/link",
+            HttpEntity(data, headers), ShortUrlDataOut::class.java)
+        Thread.sleep(4_000)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(1)
+
+        val secondResponse =
+            restTemplate.getForEntity(response.headers.location,
+                String::class.java)
+        assertThat(secondResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `creates returns created if url is reachable`() {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
+
+        val data: MultiValueMap<String, String> = LinkedMultiValueMap()
+        data["url"] = "http://www.unizar.es/"
+
+        val response = restTemplate.postForEntity("http://localhost:$port/api/link",
+            HttpEntity(data, headers), ShortUrlDataOut::class.java)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(1)
+    }
+
+    @Test
+    fun `creates returns created if url is  reachable and redirects to that url returns bad request`() {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
+
+        val data: MultiValueMap<String, String> = LinkedMultiValueMap()
+        data["url"] = "http://www.unizar.es/"
+
+        val response = restTemplate.postForEntity("http://localhost:$port/api/link",
+            HttpEntity(data, headers), ShortUrlDataOut::class.java)
+        Thread.sleep(4_000)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(1)
+
+        val secondResponse =
+            restTemplate.getForEntity(response.headers.location,
+                String::class.java)
+        assertThat(secondResponse.statusCode).isEqualTo(HttpStatus.TEMPORARY_REDIRECT)
     }
 }
