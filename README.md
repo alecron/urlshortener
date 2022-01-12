@@ -248,22 +248,6 @@ If the previous POST request has already been processed at the moment of the GET
 The output of the GET request has been output to the file QRCode6bb9db44.png.
 If you open this file, you can see the QR code.
 
-### FALTA DE HACER
-* Cambiar tipo de dato de rabbit por el de QRCode y quitar QRCode2.
-* Añadir ESTADO en el mensaje guardado en bd para poder coger el formato cuando no se ha consumido el mensaje por rabbit y autogenerarlo con dicho formato.
-* Modificar estilo del front del formato del codigo qr
-* Hacer tests para todos los casos:
-  * Comprobando que genera el codigo qr por defecto cuando no ha sido generado aun por rabbit y quitar wait.
-  * Comprobar peticion POST sin parametro qr
-  * Comprobar peticion POST con qr = true, GET debe devolver un qr con el formato por defecto
-  * Comprobar peticion POST con qr = true y un formato especifico, GET debe devolver un qr con dicho formato
-  * Comprobar: Si alguna de las dos peticiones anteriores devuelve errores de tipo 400 por más de un motivo deberá devolver un objeto JSON especificando el motivo concreto del error el usuario. 
-
-    Ejemplo:
-    {
-     “error”: “URI de destino no validada todavía”
-    }
-
 ## Repositories
 
 All the data is stored in a relational database. 
