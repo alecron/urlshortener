@@ -95,7 +95,7 @@ class QRServiceImpl : QRService {
         val hints = EnumMap<EncodeHintType, Any>(EncodeHintType::class.java)
         hints[EncodeHintType.ERROR_CORRECTION] = format.errorCorrectionLevel
         hints[EncodeHintType.CHARACTER_SET] = CharacterSetECI.UTF8
-        // It can be a parameter
+        // We can add other parameters as margin
         //val margin = 5
         //hints[EncodeHintType.MARGIN] = if (format.height > format.width) 100 * margin / format.height else 100 * margin / format.width
 
@@ -103,7 +103,6 @@ class QRServiceImpl : QRService {
         try {
             val color = format.color.substring(2).toLong(16).toInt()
             val background = format.background.substring(2).toLong(16).toInt()
-            println("${format.color} ${format.background}")
             val qrCodeWriter = QRCodeWriter()
             qrImage = MatrixToImageWriter.toBufferedImage(
                     qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, format.width, format.height, hints),

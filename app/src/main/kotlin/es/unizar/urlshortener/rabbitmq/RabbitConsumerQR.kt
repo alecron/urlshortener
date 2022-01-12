@@ -20,10 +20,14 @@ class RabbitConsumerQR(
     @RabbitListener(queues = ["QR_queue"])
     fun consumeMessageFromQueue(qrCode: QRCode2) {
         println("Message recieved from queue : ${qrCode.hash}")
-        val qr = qrService.generateQR("http://localhost:8080/tiny-${qrCode.hash}", qrCode.format)
-        //sleep(60000) //1minuto -> Prueba para ver si genera el codigo QR en el momento cuando no está
-        //Añadir en db
-        qrCodeRepository.save(QRCode(qrCode.hash, qrCode.format, qr))
-        println("QR code saved at repository: ${qrCode.hash}")
+        try{
+            val qr = qrService.generateQR("http://localhost:8080/tiny-${qrCode.hash}", qrCode.format)
+            //sleep(60000) //1minuto -> Prueba para ver si genera el codigo QR en el momento cuando no está
+            //Añadir en db
+            qrCodeRepository.save(QRCode(qrCode.hash, qrCode.format, qr))
+            println("QR code saved at repository: ${qrCode.hash}")
+        } catch(e: Exception){
+            println("QR not saved at repository ${qrCode.hash} because ${e}")
+        }
     }
 }
