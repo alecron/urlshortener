@@ -38,12 +38,17 @@ class CreateShortUrlUseCaseImpl(
             )
         )
         val suReturned = shortUrlRepository.save(su)
+        // Once it has been checked if the url is reachable,
+        // reachable and validated fields of the shortUrl are updated
         reachable.handleAsync { _, _ ->
             val shortUrlSaved: ShortUrl? = shortUrlRepository.findByKey(id)
             if (shortUrlSaved != null) {
                 if (reachable.isCompletedExceptionally) {
+                    // In case an exception has occurred while reaching the remote server
                     shortUrlSaved.properties.reachable = false
                 } else {
+                    // If no exception has occurred but answer is not ready yet
+                    // properties.reachable is set to false
                     shortUrlSaved.properties.reachable = reachable.getNow(false)
                 }
                 shortUrlSaved.properties.validated = true

@@ -24,8 +24,10 @@ class RedirectUseCaseImpl(
         val redirection : Redirection = su?.redirection
             ?: throw RedirectionNotFound(key)
         if (!su.properties.validated) {
+            // Case url has not been validated yet
             throw UrlNotValidatedYet(redirection.target)
         } else if (su.properties.validated && !su.properties.reachable) {
+            // Case url has been validated but it is not reachable
             throw UrlNotReachable(redirection.target)
         }
         return redirection
